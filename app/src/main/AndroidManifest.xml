@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+  <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+  <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+  <application
+      android:name=".PlanRecordApplication"
+      android:allowBackup="false"
+      android:fullBackupContent="false"
+      android:dataExtractionRules="@xml/data_extraction_rules"
+      android:icon="@drawable/ic_launcher"
+      android:label="@string/app_name"
+      android:localeConfig="@xml/locales_config"
+      android:supportsRtl="true"
+      android:theme="@style/Theme.PlanRecord"
+      tools:targetApi="33">
+    <activity
+        android:name=".MainActivity"
+        android:exported="true">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity>
+    <receiver android:name=".feature.timer.AlarmReceiver" android:exported="false">
+      <intent-filter>
+        <action android:name="android.intent.action.BOOT_COMPLETED" />
+        <action android:name="android.intent.action.TIME_SET" />
+        <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+        <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
+      </intent-filter>
+    </receiver>
+    <!-- The automatic WebDAV backup: its own alarm, re-armed after every run and after a reboot. -->
+    <receiver android:name=".data.backup.BackupReceiver" android:exported="false">
+      <intent-filter>
+        <action android:name="app.chronotation.BACKUP" />
+        <action android:name="android.intent.action.BOOT_COMPLETED" />
+        <action android:name="android.intent.action.TIME_SET" />
+        <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+      </intent-filter>
+    </receiver>
+  </application>
+</manifest>
