@@ -920,3 +920,37 @@
 | CB7 | 版本 | `versionCode 36` / `versionName 0.10.0`（M12 的备份部分落地）。 |
 
 验证：`:app:assembleDebug :app:testDebugUnitTest :app:lintDebug`（131 个用例、0 失败）与 `:app:assembleRelease` 通过。新增 `BackupTest` 七例：全表往返逐字段比对（含重复规则、跨日偏移、截止时间、属性值、目标的周期与过期时间）、恢复替换而非合并、非本应用/更高 format 的文件被拒绝**且原数据未被触碰**、父缺失的分类降级不丢、`nextTrigger` 跨零点、WebDAV 地址拼接与未配置即报错、连不上的地址归为网络类错误。模拟器实测：设置页新增「备份」分组（备份到文件 / 从文件恢复 / WebDAV 备份 · 尚未备份）三个图标与既有项不重复；打开 WebDAV 面板可填地址/账号/密码/目录、可切自动备份与时间、显示上次备份；在地址留空时点「测试连接」正确显示「请先填写 WebDAV 信息」（面板内容未保存，返回即丢弃）。release 2.1 MB 已放桌面。
+
+## CC. 迁移到 Chronota 标识并发布 0.1.0 预览（2026-09-11）
+
+仓库迁移到 `D:\Projects\chronota` 后，把遗留命名统一到 Chronota，并发布首个预览版。
+本节之前的历史条目保留当时的 `plan-record` / `app.planrecord` / `app.chronotation`
+名称，不再回改。
+
+| ID | 项目 | 说明 |
+| --- | --- | --- |
+| CC1 | 包标识 | `namespace`、`applicationId`、源码包目录与 Kotlin 包声明全部由 `app.chronotation` 改为 `app.chronota`；Room 库文件名由 `plan-record.db` 改为 `chronota.db`；导出 schema 目录随数据库类改为 `app/schemas/app.chronota.data.db.AppDatabase`（1.json … 11.json 原样保留，`MigrationTest` 的路径同步更新）。schema 版本仍为 11，1 → … → 11 的非破坏迁移不变。 |
+| CC2 | 命名清理 | `PlanRecordApplication` → `ChronotaApplication`，`PlanRecordApp` → `ChronotaApp`，`PlanRecordTheme` / `PlanRecordShapes` / `PlanRecordTypography` → `Chronota*`；资源主题 `Theme.PlanRecord` → `Theme.Chronota`；日志标签 `plan-record`、通知 data URI `planrecord://alarm`、备份广播动作 `app.chronotation.BACKUP` 全部随包名/产品名更新。备份 JSON 的 `app` 头在更早版本已是 `chronota`，格式未变。 |
+| CC3 | 全新标识的取舍 | 与 CA1 的「只改显示名、保留安装标识」不同，本轮按需求确认改为**全新应用标识**：0.1.0 与旧包 `app.chronotation`（0.10.0）不属于同一条安装链，覆盖安装会失败，旧数据需用旧版「备份到文件 / WebDAV」导出后在新版导入。规则 11 自本版起锁定新的 `applicationId` 与库名，`scripts/release.ps1` 也不得改名或换签名。 |
+| CC4 | 版本与交付 | `versionCode 1` / `versionName 0.1.0`。新增 `scripts/release.ps1`：`assembleRelease` 后把 `app-release.apk` 复制为桌面 `Chronota-<版本>.apk`，此后每个 release 都执行同一动作；`scripts/preview-debug.ps1` 更新为新包名，SDK 优先取工作区 `.tools/sdk`、其次 `local.properties`，AVD 优先 `chronota`、否则取第一个可用。 |
+| CC5 | 文档 | `README.md` 更新为 0.1.0 现状（包名、结构、schema 11、目标与备份功能、测试说明）；`AGENTS.md` 标题与 Design System 名称改为 Chronota，并加入「每个 release 复制到桌面」的约定；`docs/DEMO.md` 补目标与备份入口、schema 改 11；`docs/ROADMAP.md` 更新 M12 状态并新增本节摘要；`docs/PRODUCT_SPEC.md` 项目名改为 Chronota。 |
+| CC6 | 本机构建环境 | 迁移只带了源码，`.tools`（SDK/AVD/Gradle 缓存，均被忽略）留在旧工作区。以目录联接把 `.tools` 与 `.gradle-user-home` 接回新工作区，`local.properties` 指向 `D:\Projects\chronota\.tools\sdk`，避免重新下载数 GB 工具链；这些联接不进版本库，换机器仍需按 `README.md` 重新准备。 |
+
+验证：`:app:assembleDebug :app:testDebugUnitTest :app:lintDebug`（131 个用例、0 失败、0 错误，Lint 0 问题）与 `:app:assembleRelease` 通过。`aapt2 dump badging app-release.apk` 输出 `package: name='app.chronota' versionCode='1' versionName='0.1.0'`、`application-label:'Chronota'`、minSdk 26 / targetSdk 36。release 1.97 MB 经 `scripts/release.ps1 -SkipBuild` 复制为桌面 `Chronota-0.1.0.apk`。Android 35 模拟器实测：debug 与 R8 压缩后的 release 均安装成功，`dumpsys package app.chronota` 显示 versionCode 1 / versionName 0.1.0，`MainActivity` 正常获得焦点，`logcat` 无 AndroidRuntime 异常；旧包 `app.chronotation` 仍与新包并存，确认两者是相互独立的应用。截图为 0.1.0 空库首次启动的今日页。未做逐项人工触摸与真机检查。
+
+## CD. 修复 WebDAV 连不上服务器（0.1.1，2026-09-11）
+
+用户反馈用坚果云账号连接失败，界面显示"连接不上服务器"。定位到**两个叠加的原因**，
+备份功能从 0.10.0 落地起就没有真正建立过一次连接。
+
+| ID | 项目 | 说明 |
+| --- | --- | --- |
+| CD1 | 缺少网络权限 | `AndroidManifest.xml` 从未声明 `android.permission.INTERNET`，只有通知、开机与精确闹钟三项。没有该权限时系统直接拒绝套接字，`WebDavClient` 把 `IOException` 兜底成 `NETWORK`，所以界面一律显示"连接不上服务器"。0.1.1 补上该权限并加注释说明它是 WebDAV 的唯一网络用途。 |
+| CD2 | Android 拒绝 WebDAV 动词 | 即使补了权限仍然失败。日志给出决定性证据：`java.net.ProtocolException: Expected one of [OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, PATCH] but was MKCOL`，抛出点是 `com.android.okhttp.internal.huc.HttpURLConnectionImpl.setRequestMethod`。Android 的 `HttpURLConnection` 只接受固定动词，MKCOL 与 PROPFIND 一律被拒；`ProtocolException` 继承自 `IOException`，于是同样被映射成"网络错误"。 |
+| CD3 | 改法 | 新增 `data/backup/WebDavHttp.kt`：用 socket 手写一次 HTTP/1.1 交换，保留 MKCOL / PROPFIND / PUT / GET 四种动词。TLS 仍走平台信任库，并设置 `endpointIdentificationAlgorithm = "HTTPS"` 与 SNI，使证书不受信或域名不匹配时握手就失败；响应体同时支持 `Content-Length` 与 chunked（长度上限 32 MB）；明文 `http` 仍先问 `NetworkSecurityPolicy`，不因走原始套接字而绕过平台的明文限制。`WebDavClient` 只保留动词与状态码语义，不再依赖 `HttpURLConnection`；失败会在 logcat 记一条带异常类名的告警，便于以后排查。这样不必为三个动词引入完整的 HTTP 客户端。 |
+| CD4 | 版本 | `versionCode 2` / `versionName 0.1.1`。 |
+| CD5 | 备份即保存 | 面板原先必须按「保存」再按「立即备份」，否则备份用的是**已保存**的配置，会提示"请先填写 WebDAV 信息"。现在「立即备份」先把面板里的地址、账号、密码、目录连同自动备份开关与时间一起保存，再执行上传，不需要先按保存；「保存」按钮保留给"只想存、不想传"的情况。「测试连接」仍只用当前输入值、不落盘；「从云端恢复」也直接用当前输入值，同样不需要先保存。 |
+
+验证：`:app:assembleDebug :app:testDebugUnitTest :app:lintDebug`（131 个用例、0 失败、0 错误，Lint 0 问题）与 `:app:assembleRelease` 通过；`aapt2 dump permissions` 显示 release 已带 `android.permission.INTERNET`。Android 35 模拟器上用**真实坚果云账号**实测（debug 与 R8 压缩后的 release 各跑一遍）：设置 → 备份 → WebDAV backup，「测试连接」返回「Connection works」（对应 MKCOL + PROPFIND）；「立即备份」返回「Backup written」并把 `chronota-latest.json` 写到 `/dav/chronota/`，用桌面 curl 复核为 HTTP 200，内容为合法备份（`app: chronota`、`format: 1`、`schema: 11`）；「从云端恢复」返回「Data restored」（对应 GET）。测试产生的备份文件随后用 `DELETE` 从账号删除（204，再查为 404），避免之后在真机上误点恢复而覆盖真实数据；空的 `chronota` 目录保留，作为应用既定的备份位置。
+
+补充验证（CD5）：清空应用数据后只填输入框、**不按「保存」**直接点「立即备份」，面板返回「Backup written」，桌面 curl 复核文件为 HTTP 200，随后查 DataStore 已写入 `webdav_url` / `webdav_user` / `webdav_password` / `webdav_folder`（备份前同一文件里没有任何 WebDAV 键），说明"备份即保存"确实生效；debug 与 release 各验一遍。测试用的备份文件两次都用 `DELETE` 从账号删除（204，复查 404）。顺带修掉一处 socket 泄漏：连接被拒或握手失败时 `open()` 里的裸 socket 没有关闭，单元测试会打印 `A resource failed to call close`，现在失败路径统一 `close()`。

@@ -1,4 +1,4 @@
-# plan-record engineering rules
+# Chronota engineering rules
 
 1. Plan and Record are separate domain entities.
 2. A Plan never becomes a Record.
@@ -10,14 +10,14 @@
 8. UI code must not independently implement temporal-state rules.
 9. Database schema changes require explicit consideration and migration.
 10. Never use destructive Room migration for user data.
-11. Never change the `applicationId`, the Room database file name, or an existing signing key: they define the installed app and where its data lives, so changing them orphans user data. Bump the schema version and ship a non-destructive migration instead.
+11. Never change the `applicationId` (`app.chronota`), the Room database file name (`chronota.db`), or an existing signing key: they define the installed app and where its data lives, so changing them orphans user data. Bump the schema version and ship a non-destructive migration instead. The 0.1.0 preview established this identity; it is fixed from here on.
 12. Business data belongs in Room.
 13. User preferences belong in DataStore.
 14. Today is timeline-first. Avoid adding unnecessary permanent UI elements.
 15. Equivalent actions from different gestures must reuse the same domain/repository logic.
 16. Do not implement persistence directly inside Composables.
 17. Do not hard-code user-visible strings. Maintain English and Simplified Chinese resources together.
-18. UI styling must use the shared plan-record Design System.
+18. UI styling must use the shared Chronota Design System.
 
 ## Working agreement
 
@@ -36,6 +36,8 @@
 - Use `Instant` for actual events; preserve local calendar semantics for Plans.
 - Never manufacture sample history in the production database.
 - Do not commit SDKs, machine paths, build products, credentials, or local caches.
+- Every release is copied to the Desktop as `Chronota-<versionName>.apk` by
+  `scripts/release.ps1`; keep one copy per version so previews stay distinguishable.
 - A successful compilation is not evidence of a successful device test. Report
   build, JVM tests, emulator/device tests, and manual checks separately.
 

@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+  <!-- The WebDAV backup is the only network call the app makes; without this every transfer is
+       rejected by the system and surfaces as "could not reach the server". -->
+  <uses-permission android:name="android.permission.INTERNET" />
   <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
   <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
   <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
   <application
-      android:name=".PlanRecordApplication"
+      android:name=".ChronotaApplication"
       android:allowBackup="false"
       android:fullBackupContent="false"
       android:dataExtractionRules="@xml/data_extraction_rules"
@@ -13,7 +16,7 @@
       android:label="@string/app_name"
       android:localeConfig="@xml/locales_config"
       android:supportsRtl="true"
-      android:theme="@style/Theme.PlanRecord"
+      android:theme="@style/Theme.Chronota"
       tools:targetApi="33">
     <activity
         android:name=".MainActivity"
@@ -34,7 +37,7 @@
     <!-- The automatic WebDAV backup: its own alarm, re-armed after every run and after a reboot. -->
     <receiver android:name=".data.backup.BackupReceiver" android:exported="false">
       <intent-filter>
-        <action android:name="app.chronotation.BACKUP" />
+        <action android:name="app.chronota.BACKUP" />
         <action android:name="android.intent.action.BOOT_COMPLETED" />
         <action android:name="android.intent.action.TIME_SET" />
         <action android:name="android.intent.action.TIMEZONE_CHANGED" />

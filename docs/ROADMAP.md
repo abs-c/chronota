@@ -3,6 +3,10 @@
 遵循原始需求，每个阶段先编译、测试并记录结果，再进入下一阶段。
 未通过验证的阶段不能标成完成；基础空态不等于对应业务功能已实现。
 
+> 应用在 0.9.16 更名为 Chronota（显示名），0.1.0 预览版起包标识统一为
+> `app.chronota` / `chronota.db`。本文件与 `ISSUES.md` 的早期记录保留当时的
+> `plan-record` / `app.planrecord` / `app.chronotation` 名称，便于对照历史。
+
 | 阶段 | 范围 | 状态 |
 | --- | --- | --- |
 | M0 | 工程、主题、Design System、i18n、Navigation、AGENTS.md | 已交付；构建/JVM 测试/Lint 通过，真机待验 |
@@ -17,7 +21,7 @@
 | M9 | 待规划 Sheet、统一 schedulePlan、拖拽安排 | 点击安排已接通并通过构建；拖出 Sheet 留后续 |
 | M10 | 分类属性定义、六种类型、Record 动态表单 | 已实现并通过构建与已有测试 |
 | M11 | Review 时段、分类统计、趋势、Plan vs Actual | 已实现；统计关联与跨日裁切测试通过 |
-| M12 | 备份与导入导出、Undo、无障碍、异常与回归测试 | 确认保护、异常提示与基础回归已做；备份和 Undo 待后续 |
+| M12 | 备份与导入导出、Undo、无障碍、异常与回归测试 | 备份（本地文件 + WebDAV + 自动）已交付；Undo、无障碍与设备端回归待后续 |
 
 ## M0 交付范围（0.1.0 历史记录）
 
@@ -273,3 +277,39 @@ Room schema 4 已导出；1 → 2 → 3 → 4 的迁移测试验证已有数据�
   记录/计划编辑器统一底色、循环对话框与间隔/结束、提醒 1 小时/2 小时/自定义、
   月历按天展开循环、周历七天同屏、深色日程与日历；启动日志无 AndroidRuntime 异常。
 - 截图：`.tools/preview/fix-*.png`。物理设备与设备端自动化仍未执行。
+
+### Chronota 0.1.0 预览（重命名与发布）· 2026-09-11
+
+仓库迁移到 `D:\Projects\chronota` 后，统一包标识并发布首个 Chronota 预览版。
+
+- 包名、源码包、`namespace`、`applicationId` 由 `app.chronotation` 改为
+  `app.chronota`；`PlanRecord*` 类改为 `Chronota*`，主题 `Theme.PlanRecord` 改为
+  `Theme.Chronota`，日志标签、通知 data URI 与备份广播动作同步更名。
+- Room 库文件名由 `plan-record.db` 改为 `chronota.db`，导出 schema 目录改为
+  `app/schemas/app.chronota.data.db.AppDatabase`；schema 仍为 11，1 → … → 11 的
+  非破坏迁移全部保留。
+- 这是**全新的应用标识**：0.1.0 与旧包 `app.chronotation`（0.10.0）不属于同一条
+  安装链，旧数据需通过本地备份文件或 WebDAV 导入迁移。规则 11 自本版起锁定新的
+  `applicationId` 与数据库文件名。
+- 版本重置为 `versionCode 1` / `versionName 0.1.0`。
+- 新增 `scripts/release.ps1`：构建 release 并把 `Chronota-<版本>.apk` 复制到桌面，
+  作为此后每个 release 的固定交付动作；`scripts/preview-debug.ps1` 改用新包名并
+  自动选择可用 AVD。
+
+验证：构建、JVM 测试、Lint 与 `aapt2 dump badging` 结果见 `ISSUES.md` 的 CC 条目。
+
+### WebDAV 连通性修复 · 0.1.1 · 2026-09-11
+
+备份功能从 0.10.0 起就没有真正连上过服务器，本轮定位到两个叠加的原因并修复。
+
+- 缺少 `android.permission.INTERNET`：所有请求被系统拒绝，并统一落进网络错误分支。
+- Android 的 `HttpURLConnection` 只接受固定动词列表，WebDAV 的 MKCOL / PROPFIND 抛出
+  `ProtocolException`；该异常继承自 `IOException`，因此显示成"连接不上服务器"。
+  新增 `WebDavHttp`，用 socket 手写 HTTP/1.1（TLS 仍用系统信任库并强制 HTTPS
+  endpoint identification），避免为三个动词引入整个 HTTP 客户端。
+- 版本 `versionCode 2` / `versionName 0.1.1`；release 已复制到桌面。
+- 「立即备份」改为先把面板里的账号信息保存再上传，不必先按「保存」；「测试连接」与
+  「从云端恢复」直接用当前输入值，同样不需要先保存。
+
+验证见 `ISSUES.md` 的 CD 条目：在 Android 35 模拟器上用真实坚果云账号跑通
+测试连接 / 立即备份 / 从云端恢复。

@@ -6,15 +6,17 @@ plugins {
 }
 
 android {
-    namespace = "app.chronotation"
+    namespace = "app.chronota"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "app.chronotation"
+        // The Chronota identity. `applicationId` and the Room file name decide where installed data
+        // lives, so once this preview ships they must not change again (rule 11).
+        applicationId = "app.chronota"
         minSdk = 26
         targetSdk = 36
-        versionCode = 36
-        versionName = "0.10.0"
+        versionCode = 2
+        versionName = "0.1.1"
         resourceConfigurations += listOf("en", "zh-rCN")
     }
 

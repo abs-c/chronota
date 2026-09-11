@@ -1,8 +1,8 @@
-请开发一个可实际运行、可持续迭代的 Android 时间管理应用，项目名和应用名暂定为 **plan-record**。
+请开发一个可实际运行、可持续迭代的 Android 时间管理应用，项目名和应用名定为 **Chronota**。
 
 ## 1. 产品定位
 
-plan-record 是一个以 **“计划（Plan）与实际记录（Record）”** 为核心的时间管理应用。
+Chronota 是一个以 **“计划（Plan）与实际记录（Record）”** 为核心的时间管理应用。
 
 核心理念：
 
@@ -1083,7 +1083,7 @@ UI 测试只覆盖关键流程。
 14. Equivalent actions from different gestures must reuse the same domain/repository logic.
 15. Do not implement persistence directly inside Composables.
 16. Do not hard-code user-visible strings.
-17. UI styling must use the shared plan-record Design System.
+17. UI styling must use the shared Chronota Design System.
 ```
 
 ---
