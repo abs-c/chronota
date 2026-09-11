@@ -17,6 +17,18 @@ import org.robolectric.annotation.GraphicsMode
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 class CategoryFlowTest {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
+
+    /**
+     * The list is lazy and fills in from the store, so a row written just before this call may not be
+     * there yet. Scroll until it is: waiting on the node itself would never fire for a lazy list,
+     * because an off-screen item is not composed.
+     */
+    private fun scrollCategoryListTo(text: String) {
+        compose.waitUntil(15_000) {
+            runCatching { compose.onNodeWithTag("category_list").performScrollToNode(hasText(text)) }.isSuccess
+        }
+    }
+
     @Test fun categoryGridCreatesChildInSelectedGroup() {
         compose.waitUntil(15_000) { compose.onAllNodesWithTag("nav_settings").fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithTag("nav_settings").performClick()
@@ -27,12 +39,13 @@ class CategoryFlowTest {
         compose.onNodeWithTag("category_name").performTextInput("Study")
         compose.onNodeWithTag("save").performScrollTo().performClick()
         compose.waitUntil(15_000) { compose.onAllNodesWithTag("category_name").fetchSemanticsNodes().isEmpty() }
-        compose.onNodeWithTag("category_list").performScrollToNode(hasText("Study"))
+        scrollCategoryListTo("Study")
         compose.onAllNodesWithText("Add subcategory").onLast().performScrollTo().performClick()
         compose.waitUntil(15_000) { compose.onAllNodesWithTag("category_name").fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithTag("category_name").performTextInput("Reading")
         compose.onNodeWithTag("save").performScrollTo().performClick()
         compose.waitUntil(15_000) { compose.onAllNodesWithTag("category_name").fetchSemanticsNodes().isEmpty() }
+        scrollCategoryListTo("Reading")
         compose.onNodeWithText("Reading").assertIsDisplayed()
         compose.onNodeWithText("Study").performClick()
         compose.onNodeWithText("Reading").assertDoesNotExist()
