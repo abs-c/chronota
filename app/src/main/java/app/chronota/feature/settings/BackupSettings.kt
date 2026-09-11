@@ -15,7 +15,6 @@ import app.chronota.data.backup.WebDavFailure
 import app.chronota.data.repository.AppPreferences
 import app.chronota.ui.components.*
 import app.chronota.ui.theme.*
-import java.time.Instant
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -79,12 +78,6 @@ private sealed interface BackupState {
     val stamp = at.atZone(zone).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
     return stringResource(R.string.backup_last) + " · " + stamp
 }
-
-/** Formats a backup time for the row's description. */
-@Composable fun lastBackupSummary(value: AppPreferences): String = lastBackupText(value, ZoneId.systemDefault())
-
-/** The label used when a restore fails because the file was not ours. */
-
 
 /** Turns any backup failure into the one line the settings page should show for it. */
 fun backupErrorResource(error: Throwable): Int = when (error) {

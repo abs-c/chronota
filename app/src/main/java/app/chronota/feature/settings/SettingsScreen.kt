@@ -61,9 +61,9 @@ fun SettingsScreen(themeMode: ThemeMode, onTheme: (ThemeMode) -> Unit, onBack: (
             OptionRow(stringResource(R.string.orb_action), AppIcons.Orbit, { panel = "orb" }, description = stringResource(orbAction.label()))
             }
             SettingsSection(R.string.settings_backup) {
-            OptionRow(stringResource(R.string.backup_export), AppIcons.Copy, onBackupExport, description = stringResource(R.string.backup_export_hint))
-            OptionRow(stringResource(R.string.backup_import), AppIcons.Copy, onBackupImport, description = stringResource(R.string.backup_import_hint))
-            OptionRow(stringResource(R.string.backup_webdav), AppIcons.Cloud, { panel = "backup" }, description = lastBackupSummary(timerPreferences))
+            OptionRow(stringResource(R.string.backup_export), AppIcons.Copy, onBackupExport)
+            OptionRow(stringResource(R.string.backup_import), AppIcons.Copy, onBackupImport)
+            OptionRow(stringResource(R.string.backup_webdav), AppIcons.Cloud, { panel = "backup" })
             }
             SettingsSection(R.string.settings_notifications) {
             OptionRow(stringResource(R.string.notification_settings), AppIcons.Bell, notificationSettings)

@@ -259,9 +259,7 @@
     <string name="settings_interaction">Interaction</string>
     <string name="settings_backup">Backup</string>
     <string name="backup_export">Back up to a file</string>
-    <string name="backup_export_hint">Write everything to a file you choose</string>
     <string name="backup_import">Restore from a file</string>
-    <string name="backup_import_hint">Replace everything with the contents of a file</string>
     <string name="backup_confirm_title">Restore backup</string>
     <string name="backup_confirm_body">Restoring replaces all of your current data with the contents of this backup, and it cannot be undone. Continue?</string>
     <string name="backup_restored">Data restored</string>

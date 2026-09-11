@@ -256,9 +256,7 @@
     <string name="settings_interaction">交互</string>
     <string name="settings_backup">备份</string>
     <string name="backup_export">备份到文件</string>
-    <string name="backup_export_hint">把全部数据写进你指定的文件</string>
     <string name="backup_import">从文件恢复</string>
-    <string name="backup_import_hint">用文件内容替换当前的全部数据</string>
     <string name="backup_confirm_title">恢复备份</string>
     <string name="backup_confirm_body">恢复会用它替换你当前的全部数据，且无法撤销。继续吗？</string>
     <string name="backup_restored">数据已恢复</string>
