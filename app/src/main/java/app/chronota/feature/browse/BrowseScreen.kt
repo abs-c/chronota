@@ -351,7 +351,9 @@ fun ModeTabs(labels: List<Int>, selected: Int, select: (Int) -> Unit, tag: Strin
                     }
                 }
             }
-            Column(Modifier.fillMaxSize().padding(top = Space.xs).cardSurface(SheetShape)) {
+            // The month grid is the backdrop here and the day's entries are the cards on it, so this
+            // scale alone does not open a sheet.
+            Column(Modifier.fillMaxSize().padding(top = Space.xs)) {
                 val monthSwipe = rememberSwipeController()
                 Column(Modifier.weight(1f).swipeGestures(monthSwipe, { date = date.minusMonths(1) }, { date = date.plusMonths(1) })) {
                 Box(Modifier.fillMaxWidth().height(fullHeight + (collapsedHeight - fullHeight) * fraction).clipToBounds()

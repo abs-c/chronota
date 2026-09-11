@@ -11,39 +11,42 @@ import androidx.compose.ui.graphics.Color
 import app.chronota.ui.components.PressIndication
 
 /**
- * A grouped background with raised white content on top of it.
+ * Apple's grouped colors, mapped onto the Material roles.
  *
- * The page is gray and everything that is the content — a settings group, a calendar, a card, a
- * field — is white and lifts off it with [cardSurface]. That is why `surfaceContainer` is white
- * here rather than the field gray of a stock Material palette: in this app it is the sheet, not the
- * well. The roles read as:
+ * `background` is `systemGroupedBackground` and `surface` is `systemBackground`: a page that is one
+ * continuous canvas — the timeline, the day and week views — paints `surface` and has no layering at
+ * all, while a page made of cards sits on `background` and puts `secondarySystemGroupedBackground`
+ * (white) on top of it. The roles read as:
  *
- * - `background` / `surface` / `surfaceContainerLow`: the grouped page and the panels that open on
- *   it, which are the same color because a panel is the page lifted over a dimmed backdrop.
+ * - `background` / `surfaceContainerLow`: the grouped page and the panels that open on it, which are
+ *   the same color because a panel is the page lifted over a dimmed backdrop.
+ * - `surface`: the plain canvas of a page with nothing to separate.
  * - `surfaceContainer`: the white sheet on top — cards, rows, fields and chips.
  * - `surfaceContainerHigh`: a well inside a sheet — progress tracks, empty heat-map cells, the
- *   segmented control's track.
- * - `surfaceContainerHighest`: the quiet gray button.
- * - `surfaceContainerLowest`: the raised thumb of a segmented control, which is the lightest
- *   surface in light mode and the lightest well in dark mode.
+ *   segmented control's track (`systemGray5`).
+ * - `surfaceContainerHighest`: the quiet gray button (`systemGray4` in the dark).
+ * - `surfaceContainerLowest`: the raised thumb of a segmented control (`systemGray2` in the dark).
+ * - `outline` / `outlineVariant`: Apple's separators, which is what grid lines are here.
+ *
+ * The text colors are deliberately a shade darker than `secondaryLabel` so 12sp labels stay legible.
  */
 private val LightColors = lightColorScheme(
     primary = Color(0xFF4565BE), onPrimary = Color(0xFFFFFFFF),
     primaryContainer = Color(0xFFE4EAFC), onPrimaryContainer = Color(0xFF304A92),
     secondary = Color(0xFF6E6E73), onSecondary = Color(0xFFFFFFFF),
-    secondaryContainer = Color(0xFFE9E9EB), onSecondaryContainer = Color(0xFF1C1C1E),
-    tertiary = Color(0xFF6E6E73), onTertiary = Color(0xFFFFFFFF),
-    tertiaryContainer = Color(0xFFE9E9EB), onTertiaryContainer = Color(0xFF1C1C1E),
+    secondaryContainer = Color(0xFFE5E5EA), onSecondaryContainer = Color(0xFF1C1C1E),
+    tertiary = Color(0xFF8E8E93), onTertiary = Color(0xFFFFFFFF),
+    tertiaryContainer = Color(0xFFE5E5EA), onTertiaryContainer = Color(0xFF1C1C1E),
     background = Color(0xFFF2F2F7), onBackground = Color(0xFF1C1C1E),
-    surface = Color(0xFFF2F2F7), onSurface = Color(0xFF1C1C1E),
-    surfaceVariant = Color(0xFFE9E9EB), onSurfaceVariant = Color(0xFF6E6E73),
+    surface = Color(0xFFFFFFFF), onSurface = Color(0xFF1C1C1E),
+    surfaceVariant = Color(0xFFE5E5EA), onSurfaceVariant = Color(0xFF6E6E73),
     surfaceContainer = Color(0xFFFFFFFF), surfaceContainerLow = Color(0xFFF2F2F7),
-    surfaceContainerHigh = Color(0xFFE9E9EB), surfaceContainerHighest = Color(0xFFE0E0E5),
+    surfaceContainerHigh = Color(0xFFE5E5EA), surfaceContainerHighest = Color(0xFFE5E5EA),
     surfaceContainerLowest = Color(0xFFFFFFFF),
-    surfaceDim = Color(0xFFE0E0E5), surfaceBright = Color(0xFFFFFFFF),
+    surfaceDim = Color(0xFFE5E5EA), surfaceBright = Color(0xFFFFFFFF),
     inverseSurface = Color(0xFF1C1C1E), inverseOnSurface = Color(0xFFF2F2F7),
     inversePrimary = Color(0xFFE4EAFC),
-    outline = Color(0xFFC7C7CC), outlineVariant = Color(0xFFE0E0E5),
+    outline = Color(0xFFC6C6C8), outlineVariant = Color(0xFFC6C6C8),
     error = Color(0xFFB3261E), onError = Color(0xFFFFFFFF),
     surfaceTint = Color.Transparent,
 )
@@ -53,20 +56,20 @@ private val DarkColors = darkColorScheme(
     primaryContainer = Color(0xFF253759), onPrimaryContainer = Color(0xFFDCE6FF),
     secondary = Color(0xFF98989F), onSecondary = Color(0xFF1C1C1E),
     secondaryContainer = Color(0xFF2C2C2E), onSecondaryContainer = Color(0xFFF2F2F7),
-    tertiary = Color(0xFF98989F), onTertiary = Color(0xFF1C1C1E),
+    tertiary = Color(0xFF8E8E93), onTertiary = Color(0xFF1C1C1E),
     tertiaryContainer = Color(0xFF2C2C2E), onTertiaryContainer = Color(0xFFF2F2F7),
-    // The page is black in the dark, and a sheet is the same black over the dimmed backdrop; the
-    // white sheets of light mode become the raised #1C1C1E surfaces here.
+    // Both backgrounds are black in the dark, so a canvas page and a grouped page differ only by the
+    // cards the grouped one puts on top.
     background = Color(0xFF000000), onBackground = Color(0xFFF2F2F7),
     surface = Color(0xFF000000), onSurface = Color(0xFFF2F2F7),
     surfaceVariant = Color(0xFF2C2C2E), onSurfaceVariant = Color(0xFF98989F),
     surfaceContainer = Color(0xFF1C1C1E), surfaceContainerLow = Color(0xFF000000),
     surfaceContainerHigh = Color(0xFF2C2C2E), surfaceContainerHighest = Color(0xFF3A3A3C),
-    surfaceContainerLowest = Color(0xFF48484A),
+    surfaceContainerLowest = Color(0xFF636366),
     surfaceDim = Color(0xFF000000), surfaceBright = Color(0xFF2C2C2E),
     inverseSurface = Color(0xFFF2F2F7), inverseOnSurface = Color(0xFF1C1C1E),
     inversePrimary = Color(0xFF162D63),
-    outline = Color(0xFF48484A), outlineVariant = Color(0xFF2C2C2E),
+    outline = Color(0xFF38383A), outlineVariant = Color(0xFF38383A),
     error = Color(0xFFFFB4AB), onError = Color(0xFF690005),
     surfaceTint = Color.Transparent,
 )

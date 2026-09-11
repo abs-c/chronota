@@ -179,6 +179,14 @@ object Metrics {
     /** Visible gap between rounded ring segments, in degrees. */
     const val chartGapDegrees = 2f
 
+    // Gestures, fades and text thresholds.
+    /** How far a horizontal swipe travels before it turns the page. */
+    val swipeThreshold = 72.dp
+    /** The height over which a scrolling area fades out at its top edge. */
+    val fadeHeight = 12.dp
+    /** Above this block height a timeline block prints its label on more than one line. */
+    val blockLabelTall = 40.dp
+
     // Content bounds.
     val pageHeader = 56.dp
     val contentMaxWidth = 720.dp

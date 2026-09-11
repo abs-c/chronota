@@ -83,7 +83,10 @@ fun TodayScreen(onSettings: () -> Unit, state: WorkspaceState = WorkspaceState()
         scroll.scrollTo(with(density) { (hourHeight * hours).roundToPx() })
     }
     if (chooseDate) CalendarDialog(stringResource(R.string.date), date, { chooseDate = false }) { date = it; chooseDate = false }
-    PageColumn {
+    // A plain canvas page: the day is one continuous sheet of paper, so it paints the system
+    // background itself instead of sitting on the grouped gray. Only the header band is separated,
+    // by a hairline rather than by a change of color.
+    PageColumn(Modifier.background(MaterialTheme.colorScheme.surface)) {
         if (showHeader) {
         val locale = androidx.compose.ui.platform.LocalResources.current.configuration.locales[0]
         val monthPattern = if (locale.language == "zh") "yyyy 年 M 月" else "MMMM yyyy"
@@ -147,10 +150,8 @@ fun TodayScreen(onSettings: () -> Unit, state: WorkspaceState = WorkspaceState()
             if (showRecords && !singleColumn) Spacer(Modifier.weight(1f))
         }
         Spacer(Modifier.height(Space.xs))
-        // The timeline is this page's content, so on its own page it is the white sheet that fills the
-        // page below the header; the calendar's day view embeds it with showHeader = false, where that
-        // sheet already exists.
-        Box(if (showHeader) Modifier.weight(1f).cardSurface(SheetShape) else Modifier.weight(1f)) {
+        if (showHeader) HorizontalDivider(Modifier.padding(top = Space.xs), color = MaterialTheme.colorScheme.outlineVariant)
+        Box(Modifier.weight(1f)) {
             Box(Modifier.fillMaxSize().topFade().verticalScroll(scroll).padding(horizontal = Space.md).padding(top = Space.sm).padding(bottom = Metrics.dockClearance)) {
                 Box(Modifier.fillMaxWidth().height(height)) {
                     val hours = (day.millis / 3_600_000).toInt()
@@ -310,7 +311,7 @@ private fun <T> TimelineLane(modifier: Modifier, day: TimeSpan, items: List<Pair
                 Row(Modifier.padding(horizontal = Space.xxs, vertical = inset), horizontalArrangement = Arrangement.spacedBy(Space.xxs), verticalAlignment = Alignment.CenterVertically) {
                     if (full) Icon(categoryIcons.firstOrNull { it.first == category?.icon }?.second ?: AppIcons.Categories, null, Modifier.size(Metrics.timelineIcon), tint = tint)
                     if (anyLabel) Text(title, style = if (baseLabel) MaterialTheme.typography.labelMedium else MaterialTheme.typography.labelMedium.copy(fontSize = Metrics.compactLabelSize, lineHeight = Metrics.compactLabelLineHeight),
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = if (past) .6f else 1f), maxLines = if (drawn < 40.dp) 1 else 3, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = if (past) .6f else 1f), maxLines = if (drawn < Metrics.blockLabelTall) 1 else 3, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
                 }
             }
         } }

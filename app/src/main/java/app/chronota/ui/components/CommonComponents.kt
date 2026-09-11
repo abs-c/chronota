@@ -172,7 +172,7 @@ fun rememberSwipeController(): SwipeController = remember { SwipeController() }
 @Composable
 fun Modifier.swipeGestures(controller: SwipeController, onPrevious: () -> Unit, onNext: () -> Unit, enabled: Boolean = true): Modifier {
     val scope = rememberCoroutineScope()
-    val threshold = with(LocalDensity.current) { 72.dp.toPx() }
+    val threshold = with(LocalDensity.current) { Metrics.swipeThreshold.toPx() }
     val previous by rememberUpdatedState(onPrevious)
     val next by rememberUpdatedState(onNext)
     return this.onSizeChanged { controller.width = it.width.coerceAtLeast(1) }
@@ -211,7 +211,7 @@ fun Modifier.horizontalSwipe(onPrevious: () -> Unit, onNext: () -> Unit, enabled
 
 /** Softens content that scrolls directly under a static row. */
 @Composable
-fun Modifier.topFade(height: androidx.compose.ui.unit.Dp = 12.dp): Modifier {
+fun Modifier.topFade(height: androidx.compose.ui.unit.Dp = Metrics.fadeHeight): Modifier {
     val fade = with(androidx.compose.ui.platform.LocalDensity.current) { height.toPx() }
     return this.graphicsLayer { compositingStrategy = androidx.compose.ui.graphics.CompositingStrategy.Offscreen }.drawWithContent {
         drawContent()

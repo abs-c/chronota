@@ -63,7 +63,9 @@ class TimerFlowTest {
         assertTrue(compose.onAllNodesWithText("Focused reading").fetchSemanticsNodes().isNotEmpty())
         compose.onNodeWithTag("save").performSemanticsAction(SemanticsActions.OnClick) { it() }
         compose.waitUntil(15_000) { compose.onAllNodesWithTag("save").fetchSemanticsNodes().isEmpty() }
-        compose.onNodeWithContentDescription("Open actions").assertIsDisplayed()
+        // The editor's sheet is still settling when it closes, and the orb is only back on screen once
+        // the page behind it is laid out again.
+        compose.waitUntil(15_000) { runCatching { compose.onNodeWithContentDescription("Open actions").assertIsDisplayed() }.isSuccess }
     }
 
     @Test fun finishingATimerOpensItsRecordWithAttributesAndTimes() {
@@ -100,6 +102,6 @@ class TimerFlowTest {
         assertEquals(cinema, record.categoryId)
         assertEquals("Reading", record.title)
         assertEquals("电影", runBlocking { app.database.dao().recordValues(record.id) }.single().value)
-        compose.onNodeWithContentDescription("Open actions").assertIsDisplayed()
+        compose.waitUntil(15_000) { runCatching { compose.onNodeWithContentDescription("Open actions").assertIsDisplayed() }.isSuccess }
     }
 }
