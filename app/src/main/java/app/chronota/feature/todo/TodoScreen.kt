@@ -43,7 +43,7 @@ fun TodoScreen(onSettings: () -> Unit, onCategories: () -> Unit, model: Workspac
     val now = rememberNow()
     val today = now.atZone(ZoneId.systemDefault()).toLocalDate()
     app.chronota.feature.browse.BrowseScreen(false, state, { id -> planSeed = null; editing = id }, onOpenRecord,
-        { draftDate = it; planSeed = null; editing = 0 }, onCreatePlan, onCreateRecord, onGoal = onGoal, onAddGoal = onAddGoal, onDeleteGoal = onDeleteGoal, onModeChange = { onGoalsTab(it == 2) }, onPlanOccurrence = { id, occurrence -> planSeed = null; planOccurrence = occurrence; editing = id })
+        { draftDate = it; planSeed = null; editing = 0 }, onCreatePlan, onCreateRecord, onGoal = onGoal, onAddGoal = onAddGoal, onDeleteGoal = onDeleteGoal, onModeChange = { onGoalsTab(it == 1) }, onPlanOccurrence = { id, occurrence -> planSeed = null; planOccurrence = occurrence; editing = id })
     if (!state.loading && !state.failed) editing?.let { id ->
         val value = planSeed?.takeIf { id == 0L } ?: state.plans.firstOrNull { it.id == id } ?: Plan(title = "", scheduledDate = draftDate, allDay = draftDate != null)
         PlanEditor(value, state.categories, state.reminders.filter { it.planId == id }, prefs.historyPolicy, busy,

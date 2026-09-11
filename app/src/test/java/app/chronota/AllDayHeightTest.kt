@@ -63,7 +63,7 @@ class AllDayHeightTest {
     }
 
     @Test fun weekViewUsesMinimumEventHeight() {
-        compose.setContent { ChronotaTheme(false) { BrowseScreen(false, state(), {}, {}, {}) } }
+        compose.setContent { ChronotaTheme(false) { BrowseScreen(true, state(), {}, {}, {}) } }
         compose.onNodeWithTag("browse_mode_1").performClick()
         compose.onNodeWithTag("calendar_scale_1").performClick()
         assertChipMatchesMinimum(compose.onNodeWithText("All day").fetchSemanticsNode().boundsInRoot)

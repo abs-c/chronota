@@ -71,11 +71,14 @@ fun BrowseScreen(review: Boolean, state: WorkspaceState, onPlan: (Long) -> Unit,
         browseEntries(if (review) emptyList() else state.plans, records, dayStartMinutes = dayStart)
             .filter { filterIds == null || it.categoryId in filterIds }
     }
-    LaunchedEffect(mode) { onModeChange(mode) }
+    // The plans page keeps two tabs — its timeline and its goals — and they split the bar evenly.
+    // Clamping also folds away a mode saved by a build that still had a calendar here.
+    val tab = if (review) mode else mode.coerceIn(0, 1)
+    LaunchedEffect(tab) { onModeChange(tab) }
     PageColumn {
-        ModeTabs(if (review) listOf(R.string.agenda_view, R.string.calendar_view, R.string.category_totals) else listOf(R.string.agenda_view, R.string.calendar_view, R.string.goals), mode, { mode = it }, "browse_mode",
+        ModeTabs(if (review) listOf(R.string.agenda_view, R.string.calendar_view, R.string.category_totals) else listOf(R.string.agenda_view, R.string.goals), tab, { mode = it }, "browse_mode",
             top = Space.md, bottom = Space.xs)
-        when (mode) {
+        when (tab) {
             0 -> {
                 Row(Modifier.fillMaxWidth().padding(horizontal = Space.md), verticalAlignment = Alignment.CenterVertically) {
                     val chipScroll = rememberScrollState()
@@ -132,11 +135,10 @@ fun BrowseScreen(review: Boolean, state: WorkspaceState, onPlan: (Long) -> Unit,
                     if (visible.isEmpty()) item { CenterHint(R.string.empty_add_hint) }
                 }
             }
-            1 -> savedPages.SaveableStateProvider("calendar") {
-                Column(Modifier.weight(1f)) { CalendarBrowser(review, state, onPlan, onRecord, add, createPlan, createRecord) }
-            }
-            else -> if (review) savedPages.SaveableStateProvider("statistics") { Box(Modifier.weight(1f)) { statistics() } }
-                else savedPages.SaveableStateProvider("goals") { Box(Modifier.weight(1f)) { GoalList(state, onGoal, onAddGoal, onDeleteGoal) } }
+            1 -> if (review) savedPages.SaveableStateProvider("calendar") {
+                Column(Modifier.weight(1f)) { CalendarBrowser(state, onPlan, onRecord, add, createPlan, createRecord) }
+            } else savedPages.SaveableStateProvider("goals") { Box(Modifier.weight(1f)) { GoalList(state, onGoal, onAddGoal, onDeleteGoal) } }
+            else -> savedPages.SaveableStateProvider("statistics") { Box(Modifier.weight(1f)) { statistics() } }
         }
     }
 
@@ -242,7 +244,7 @@ fun ModeTabs(labels: List<Int>, selected: Int, select: (Int) -> Unit, tag: Strin
 @Composable private fun TimeLine(text: AnnotatedString, style: ComposeTextStyle) =
     Text(text, style = style, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
 
-@Composable private fun ColumnScope.CalendarBrowser(review: Boolean, state: WorkspaceState, onPlan: (Long) -> Unit, onRecord: (Long) -> Unit, add: (LocalDate?) -> Unit, createPlan: (TimeSpan) -> Unit, createRecord: (TimeSpan) -> Unit) {
+@Composable private fun ColumnScope.CalendarBrowser(state: WorkspaceState, onPlan: (Long) -> Unit, onRecord: (Long) -> Unit, add: (LocalDate?) -> Unit, createPlan: (TimeSpan) -> Unit, createRecord: (TimeSpan) -> Unit) {
     var scale by rememberSaveable { mutableIntStateOf(2) }
     val dayStart = LocalDisplayPreferences.current.dayStartMinutes
     val now = rememberNow()
@@ -255,12 +257,9 @@ fun ModeTabs(labels: List<Int>, selected: Int, select: (Int) -> Unit, tag: Strin
     var picker by remember { mutableStateOf(false) }
     val locale = LocalResources.current.configuration.locales[0]
     val zone = ZoneId.systemDefault()
-    // What each calendar shows is a setting of its own now, so neither page spends a row on switches.
+    // Whether this calendar also draws plans is its own setting; the records always belong here.
     val display = LocalDisplayPreferences.current
-    val showPlans = if (review) display.recordsCalendarPlans else true
-    // The plan calendar never draws records: a record belongs on the review side.
-    val showRecords = review
-    val pastPlans = !review
+    val showPlans = display.recordsCalendarPlans
     val range = when (scale) {
         0 -> date..date
         1 -> weekStartOf(date, LocalDisplayPreferences.current.weekStart).let { it..it.plusDays(6) }
@@ -268,17 +267,15 @@ fun ModeTabs(labels: List<Int>, selected: Int, select: (Int) -> Unit, tag: Strin
     }
     // The running timer is a record that is not stored yet, so it is added to the calendar's copy of
     // the records rather than to the state everything else reads.
-    val liveRecords = if (showRecords) listOfNotNull(state.timer?.liveRecord(now)) else emptyList()
-    val entries = remember(state.plans, state.records, state.timer, range, now, dayStart, showPlans, showRecords) {
-        calendarEntries(if (showPlans) state.plans else emptyList(), if (showRecords) state.records + liveRecords else emptyList(),
-            range.start, range.endInclusive, now, zone, dayStart, includePastPlans = pastPlans)
+    val liveRecords = listOfNotNull(state.timer?.liveRecord(now))
+    val entries = remember(state.plans, state.records, state.timer, range, now, dayStart, showPlans) {
+        calendarEntries(if (showPlans) state.plans else emptyList(), state.records + liveRecords,
+            range.start, range.endInclusive, now, zone, dayStart, includePastPlans = false)
     }
-    val dayState = remember(state, showPlans, showRecords) {
+    val dayState = remember(state, showPlans) {
         // The live record is deliberately not added to the records here: the day view draws it from the
         // timer itself, and listing it in both places would show the same entry in two lanes.
-        state.copy(plans = if (showPlans) state.plans else emptyList(),
-            records = if (showRecords) state.records else emptyList(),
-            timer = if (showRecords) state.timer else null)
+        state.copy(plans = if (showPlans) state.plans else emptyList())
     }
     ModeTabs(listOf(R.string.day, R.string.week, R.string.month), scale, { scale = it }, "calendar_scale")
     Row(Modifier.fillMaxWidth().padding(horizontal = Space.md), verticalAlignment = Alignment.CenterVertically) {
@@ -294,7 +291,7 @@ fun ModeTabs(labels: List<Int>, selected: Int, select: (Int) -> Unit, tag: Strin
     when (scale) {
         0 -> Box(Modifier.fillMaxSize().testTag("calendar_day")) {
             TodayScreen({}, dayState, onPlan = { id, _ -> if (id != 0L) onPlan(id) else add(date) }, onRecord = { id, _ -> if (id != 0L) onRecord(id) else add(date) },
-                onCreatePlan = createPlan, onCreateRecord = createRecord, calendarCutoff = if (pastPlans) null else now, selectedDate = date, showHeader = false, showPlans = showPlans, showRecords = showRecords, singleColumn = true)
+                onCreatePlan = createPlan, onCreateRecord = createRecord, calendarCutoff = now, selectedDate = date, showHeader = false, showPlans = showPlans, showRecords = true, singleColumn = true)
         }
         1 -> Column(Modifier.fillMaxSize().testTag("calendar_week")) {
             // The weekday names are a fixed header. Below them a swipe anywhere turns the week, and
@@ -368,7 +365,7 @@ fun ModeTabs(labels: List<Int>, selected: Int, select: (Int) -> Unit, tag: Strin
                             fraction = (fraction - amount / maxCollapsePx).coerceIn(0f, 1f)
                         }
                     }
-                    ) { MonthGrid(date, entries, showPlans, showRecords, { date = it }, collapse = fraction, rowsModifier = Modifier.swipeTranslation(monthSwipe)) }
+                    ) { MonthGrid(date, entries, { date = it }, collapse = fraction, rowsModifier = Modifier.swipeTranslation(monthSwipe)) }
             LazyColumn(Modifier.weight(1f).swipeTranslation(monthSwipe).topFade().nestedScroll(connection).testTag("calendar_month"), state = listState, contentPadding = PaddingValues(start = Space.md, end = Space.md, top = Space.sm, bottom = Metrics.dockClearance), verticalArrangement = Arrangement.spacedBy(Space.xs)) {
                 val dayEntries = entries.filter { it.onDate(date, zone, dayStart) }.sortedBy { it.span?.start }
                 items(dayEntries, key = { it.key }) { entry -> AgendaCard(entry, state, showKind = true, details = display.monthDetails, showRange = true) { if (entry.isPlan) onPlan(entry.id) else onRecord(entry.id) } }
@@ -381,7 +378,7 @@ fun ModeTabs(labels: List<Int>, selected: Int, select: (Int) -> Unit, tag: Strin
     if (picker) CalendarDialog(stringResource(R.string.date), date, { picker = false }) { date = it; picker = false }
 }
 
-@Composable private fun MonthGrid(selected: LocalDate, entries: List<BrowseEntry>, showPlans: Boolean, showRecords: Boolean, select: (LocalDate) -> Unit, modifier: Modifier = Modifier, collapse: Float = 0f, rowsModifier: Modifier = Modifier) {
+@Composable private fun MonthGrid(selected: LocalDate, entries: List<BrowseEntry>, select: (LocalDate) -> Unit, modifier: Modifier = Modifier, collapse: Float = 0f, rowsModifier: Modifier = Modifier) {
     val locale = LocalResources.current.configuration.locales[0]
     val zone = ZoneId.systemDefault()
     val dayStart = LocalDisplayPreferences.current.dayStartMinutes

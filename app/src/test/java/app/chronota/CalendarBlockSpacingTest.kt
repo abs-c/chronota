@@ -63,7 +63,7 @@ class CalendarBlockSpacingTest {
     }
 
     @Test fun weekBlocksNeverTouch() {
-        compose.setContent { ChronotaTheme(false) { BrowseScreen(false, state(), {}, {}, {}) } }
+        compose.setContent { ChronotaTheme(false) { BrowseScreen(true, state(), {}, {}, {}) } }
         compose.onNodeWithTag("browse_mode_1").performClick()
         compose.onNodeWithTag("calendar_scale_1").performClick()
         compose.onNodeWithTag("calendar_week").assertExists()

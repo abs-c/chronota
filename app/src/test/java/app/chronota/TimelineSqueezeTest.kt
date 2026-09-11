@@ -46,7 +46,7 @@ class TimelineSqueezeTest {
 
     @Test fun aCloseNeighbourSqueezesTheBlockInFrontOfIt() {
         // 09:00 for one minute, then 09:12: twelve minutes of room, above the ten-minute floor.
-        compose.setContent { ChronotaTheme(false) { BrowseScreen(false, state(LocalTime.of(9, 0) to LocalTime.of(9, 1), LocalTime.of(9, 12) to LocalTime.of(9, 13)), {}, {}, {}) } }
+        compose.setContent { ChronotaTheme(false) { BrowseScreen(true, state(LocalTime.of(9, 0) to LocalTime.of(9, 1), LocalTime.of(9, 12) to LocalTime.of(9, 13)), {}, {}, {}) } }
         compose.onNodeWithTag("browse_mode_1").performClick()
         compose.onNodeWithTag("calendar_scale_1").performClick()
         val blocks = blockRects().sortedBy { it.top }
@@ -60,7 +60,7 @@ class TimelineSqueezeTest {
 
     @Test fun aTouchingNeighbourKeepsTheBlockInItsOwnSlot() {
         // 09:00-09:05 and 09:05-09:20: the next starts exactly when this one ends.
-        compose.setContent { ChronotaTheme(false) { BrowseScreen(false, state(LocalTime.of(9, 0) to LocalTime.of(9, 5), LocalTime.of(9, 5) to LocalTime.of(9, 20)), {}, {}, {}) } }
+        compose.setContent { ChronotaTheme(false) { BrowseScreen(true, state(LocalTime.of(9, 0) to LocalTime.of(9, 5), LocalTime.of(9, 5) to LocalTime.of(9, 20)), {}, {}, {}) } }
         compose.onNodeWithTag("browse_mode_1").performClick()
         compose.onNodeWithTag("calendar_scale_1").performClick()
         val blocks = blockRects().sortedBy { it.top }
@@ -74,7 +74,7 @@ class TimelineSqueezeTest {
 
     @Test fun onlyGenuinelyOverlappingBlocksGoSideBySide() {
         // 09:00-09:10 and 09:05-09:15 really do overlap, so they take a lane each.
-        compose.setContent { ChronotaTheme(false) { BrowseScreen(false, state(LocalTime.of(9, 0) to LocalTime.of(9, 10), LocalTime.of(9, 5) to LocalTime.of(9, 15)), {}, {}, {}) } }
+        compose.setContent { ChronotaTheme(false) { BrowseScreen(true, state(LocalTime.of(9, 0) to LocalTime.of(9, 10), LocalTime.of(9, 5) to LocalTime.of(9, 15)), {}, {}, {}) } }
         compose.onNodeWithTag("browse_mode_1").performClick()
         compose.onNodeWithTag("calendar_scale_1").performClick()
         val blocks = blockRects().sortedBy { it.left }
@@ -85,7 +85,7 @@ class TimelineSqueezeTest {
     @Test fun aTimerStoppedOnASecondDoesNotSplitTheLane() {
         // A timer stops on a second, so 09:00-09:05:12 laps 12s over the 09:05:00 entry beside it.
         // That is a fifth of a dp: invisible, so the two must stack rather than sit side by side.
-        compose.setContent { ChronotaTheme(false) { BrowseScreen(false, state(
+        compose.setContent { ChronotaTheme(false) { BrowseScreen(true, state(
             LocalTime.of(9, 0, 0) to LocalTime.of(9, 5, 12),
             LocalTime.of(9, 5, 0) to LocalTime.of(9, 20)), {}, {}, {}) } }
         compose.onNodeWithTag("browse_mode_1").performClick()
@@ -98,7 +98,7 @@ class TimelineSqueezeTest {
 
     @Test fun aWholeMinuteOfOverlapStillTakesTwoColumns() {
         // 09:00-09:06:12 against 09:05:00 is more than a minute of real overlap, so it shows.
-        compose.setContent { ChronotaTheme(false) { BrowseScreen(false, state(
+        compose.setContent { ChronotaTheme(false) { BrowseScreen(true, state(
             LocalTime.of(9, 0, 0) to LocalTime.of(9, 6, 12),
             LocalTime.of(9, 5, 0) to LocalTime.of(9, 20)), {}, {}, {}) } }
         compose.onNodeWithTag("browse_mode_1").performClick()
