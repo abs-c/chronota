@@ -26,8 +26,11 @@ object AppIcons {
     val Today get() = CategoryIconLibrary.image("calendar-days")
     /** The orb's "new plan" action: a checklist, so it does not read as the Today tab's calendar. */
     val Plan get() = CategoryIconLibrary.image("clipboard-list")
+    /** The Records page and its "new record" action: a film strip, for what was recorded. */
+    val Record get() = CategoryIconLibrary.image("film")
     val Todo get() = CategoryIconLibrary.image("list-todo")
-    val Review get() = CategoryIconLibrary.image("chart-no-axes-combined")
+    /** Statistics, which live inside the Records page. */
+    val Chart get() = CategoryIconLibrary.image("chart-no-axes-combined")
     val Settings get() = CategoryIconLibrary.image("settings-2")
     /** Opening Settings from a page header. Distinct from [Settings], which means "show details". */
     val Wrench get() = CategoryIconLibrary.image("wrench")
@@ -52,10 +55,12 @@ object AppIcons {
     val Notebook get() = CategoryIconLibrary.image("notebook")
     /** The WebDAV backup: a copy kept off the device. */
     val Cloud get() = CategoryIconLibrary.image("cloud")
+    /** Writing a backup out to a file, and reading one back in. */
+    val Export get() = CategoryIconLibrary.image("upload")
+    val Import get() = CategoryIconLibrary.image("download")
     val Earth get() = CategoryIconLibrary.image("earth")
     val Alarm get() = CategoryIconLibrary.image("alarm-clock")
     val Target get() = CategoryIconLibrary.image("target")
     val Grip get() = CategoryIconLibrary.image("grip")
-    val Copy get() = CategoryIconLibrary.image("package")
     val WeekStart get() = CategoryIconLibrary.image("sun")
 }

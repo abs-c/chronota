@@ -107,7 +107,7 @@ private const val OVERVIEW_PAGES = 2001
                     Box(Modifier.align(Alignment.CenterEnd).width(Space.lg).fillMaxHeight().background(androidx.compose.ui.graphics.Brush.horizontalGradient(listOf(Color.Transparent, MaterialTheme.colorScheme.background))))
                 }
             }
-            IconButton(onClick = openOverview, Modifier.testTag("stats_overview")) { Icon(AppIcons.Review, stringResource(R.string.share_overview), Modifier.size(Metrics.icon)) }
+            IconButton(onClick = openOverview, Modifier.testTag("stats_overview")) { Icon(AppIcons.Chart, stringResource(R.string.share_overview), Modifier.size(Metrics.icon)) }
             IconButton(onClick = { sortDialog = true }, Modifier.testTag("stats_sort")) { Icon(AppIcons.Sort, stringResource(R.string.sort), Modifier.size(Metrics.icon)) }
         }
         LazyColumn(Modifier.fillMaxSize().topFade().testTag("statistics_list"), contentPadding = PaddingValues(start = Space.md, end = Space.md, top = Space.sm, bottom = Metrics.dockClearance), verticalArrangement = Arrangement.spacedBy(Space.xs)) {

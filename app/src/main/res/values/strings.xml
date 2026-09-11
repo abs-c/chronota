@@ -2,7 +2,7 @@
 <resources>
   <string name="app_name" translatable="false">Chronota</string>
   <string name="today">Today</string>
-  <string name="review">Review</string>
+  <string name="records_tab">Records</string>
   <string name="settings">Settings</string>
   <string name="categories">Categories</string>
   <string name="back">Back</string>
@@ -292,7 +292,7 @@
         <item quantity="other">%1$d saved values belong to choices or types this edit removes. Saving deletes them.</item>
     </plurals>
     <string name="week_start">Week starts on</string>
-    <string name="review_calendar_plans">Show plans in the review calendar</string>
+    <string name="records_calendar_plans">Show plans in the records calendar</string>
     <string name="month_details">Show details in month view</string>
     <string name="week_start_sunday">Sunday</string>
     <string name="week_start_monday">Monday</string>

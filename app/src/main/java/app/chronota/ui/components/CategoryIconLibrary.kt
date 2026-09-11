@@ -206,6 +206,8 @@ object CategoryIconLibrary {
         "trash" to "M0,0 M10 11v6 M0,0 M14 11v6 M0,0 M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6 M0,0 M3 6h18 M0,0 M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2",
         "repeat" to "M0,0 m17 2 4 4-4 4 M0,0 M3 11v-1a4 4 0 0 1 4-4h14 M0,0 m7 22-4-4 4-4 M0,0 M21 13v1a4 4 0 0 1-4 4H3",
         "sort-descending" to "M0,0 M4 6h16 M0,0 M7 12h10 M0,0 M10 18h4",
+        "upload" to "M0,0 M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4 M0,0 M17 8 12 3 7 8 M0,0 M12 3v12",
+        "download" to "M0,0 M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4 M0,0 M7 10 12 15 17 10 M0,0 M12 15V3",
     )
     private val aliases = mapOf("book" to "book-open", "code" to "code-xml", "work" to "briefcase-business", "home" to "house", "sport" to "dumbbell", "food" to "utensils", "travel" to "plane", "game" to "gamepad-2", "plant" to "sprout", "lab" to "flask-conical", "chat" to "messages-square")
     private val cache = mutableMapOf<String, ImageVector>()

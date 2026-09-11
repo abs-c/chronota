@@ -25,7 +25,7 @@ fun SettingsScreen(themeMode: ThemeMode, onTheme: (ThemeMode) -> Unit, onBack: (
     timerPreferences: app.chronota.data.repository.AppPreferences = app.chronota.data.repository.AppPreferences(),
     onLanguage: (String) -> Unit = {}, onWeekStart: (Int) -> Unit = {},
     onDayStart: (Int) -> Unit = {}, onPreferCategory: (Boolean) -> Unit = {},
-    onReviewCalendarPlans: (Boolean) -> Unit = {}, onMonthDetails: (Boolean) -> Unit = {},
+    onRecordsCalendarPlans: (Boolean) -> Unit = {}, onMonthDetails: (Boolean) -> Unit = {},
     onBackupExport: () -> Unit = {}, onBackupImport: () -> Unit = {},
     onBackupSave: (String, String, String, String, Boolean, Int, () -> Unit) -> Unit = { _, _, _, _, _, _, done -> done() },
     onBackupTest: (String, String, String, String, (Int?) -> Unit) -> Unit = { _, _, _, _, result -> result(R.string.backup_error_config) },
@@ -50,7 +50,7 @@ fun SettingsScreen(themeMode: ThemeMode, onTheme: (ThemeMode) -> Unit, onBack: (
             SwitchRow(R.string.week_view, weekView, onWeekView, icon = AppIcons.Today)
             ChoiceField(R.string.item_heading, timerPreferences.preferCategoryName,
                 listOf(false to stringResource(R.string.heading_title), true to stringResource(R.string.heading_category)), onPreferCategory, icon = AppIcons.FileText)
-            SwitchRow(R.string.review_calendar_plans, timerPreferences.reviewCalendarPlans, onReviewCalendarPlans, icon = AppIcons.Review)
+            SwitchRow(R.string.records_calendar_plans, timerPreferences.recordsCalendarPlans, onRecordsCalendarPlans, icon = AppIcons.Record)
             SwitchRow(R.string.month_details, timerPreferences.monthDetails, onMonthDetails, icon = AppIcons.Settings)
             }
             SettingsSection(R.string.settings_appearance) {
@@ -61,8 +61,8 @@ fun SettingsScreen(themeMode: ThemeMode, onTheme: (ThemeMode) -> Unit, onBack: (
             OptionRow(stringResource(R.string.orb_action), AppIcons.Orbit, { panel = "orb" }, description = stringResource(orbAction.label()))
             }
             SettingsSection(R.string.settings_backup) {
-            OptionRow(stringResource(R.string.backup_export), AppIcons.Copy, onBackupExport)
-            OptionRow(stringResource(R.string.backup_import), AppIcons.Copy, onBackupImport)
+            OptionRow(stringResource(R.string.backup_export), AppIcons.Export, onBackupExport)
+            OptionRow(stringResource(R.string.backup_import), AppIcons.Import, onBackupImport)
             OptionRow(stringResource(R.string.backup_webdav), AppIcons.Cloud, { panel = "backup" })
             }
             SettingsSection(R.string.settings_notifications) {

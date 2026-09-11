@@ -9,7 +9,7 @@
 - 两级分类与自定义属性（六种类型），拖动排序与换组。
 - 循环计划：天/周/月/年，带间隔与结束日期。
 - 目标：筛选、指标、周期、重启与历史。
-- 回顾统计：分类占比、每日趋势、活动日历与下钻。
+- 记录统计：分类占比、每日趋势、活动日历与下钻。
 - 备份：本地文件导入导出，WebDAV 测试连接、立即备份、从云端恢复，以及每日自动备份。
 - 浅色/深色/跟随系统，English 与简体中文。
 
@@ -23,6 +23,6 @@
 ## 环境
 
 - Kotlin 2.2.0、AGP 8.13.2、Gradle 8.13、Compose BOM 2025.12.00、Room 2.8.4。
-- minSdk 26，compileSdk 与 targetSdk 36；当前版本 0.1.1，schema 11。
+- minSdk 26，compileSdk 与 targetSdk 36；当前版本 0.1.2，schema 11。
 - 验证：`.\gradlew.bat :app:assembleDebug :app:testDebugUnitTest :app:lintDebug`
 - 发布：`.\scripts\release.ps1` 构建 release 并把 APK 复制到桌面。

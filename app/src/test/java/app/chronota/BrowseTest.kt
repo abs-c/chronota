@@ -41,7 +41,7 @@ class BrowseTest {
         var showsPlans by mutableStateOf(false)
         compose.setContent {
             ChronotaTheme(false) {
-                CompositionLocalProvider(LocalDisplayPreferences provides AppPreferences(reviewCalendarPlans = showsPlans)) {
+                CompositionLocalProvider(LocalDisplayPreferences provides AppPreferences(recordsCalendarPlans = showsPlans)) {
                     BrowseScreen(true, state, {}, { opened = it }, {}, statistics = { Text("Report content") })
                 }
             }

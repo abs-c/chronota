@@ -55,7 +55,7 @@ class MainActivityTest {
         compose.waitUntil(15_000) {
             compose.onAllNodesWithTag("nav_today").fetchSemanticsNodes().isNotEmpty()
         }
-        compose.onNodeWithTag("nav_review").performClick()
+        compose.onNodeWithTag("nav_records").performClick()
         compose.onNodeWithTag("nav_settings").performClick()
         compose.onNodeWithText(compose.activity.getString(R.string.appearance)).performScrollTo().performClick()
         compose.onNodeWithTag("theme_DARK").performClick()
@@ -77,7 +77,7 @@ class MainActivityTest {
         compose.onNodeWithTag("theme_DARK").assertIsSelected()
         compose.onNodeWithText("Confirm").performClick()
         compose.onNodeWithTag("nav_settings").assertIsSelected()
-        compose.onNodeWithTag("nav_review").performClick()
-        compose.onNodeWithTag("nav_review").assertIsSelected()
+        compose.onNodeWithTag("nav_records").performClick()
+        compose.onNodeWithTag("nav_records").assertIsSelected()
     }
 }

@@ -197,7 +197,7 @@ fun ChronotaApp(themeMode: ThemeMode, onTheme: (ThemeMode) -> Unit, snackbar: Sn
                         onGoal = { goalSeed = null; goalId = it }, onAddGoal = { goalSeed = null; goalId = 0 }, onDeleteGoal = { model.deleteGoal(it) {} }, onGoalsTab = { todoGoals = it },
                     )
                 }
-                composable("review") { ReviewScreen(onSettings = { nav.navigate("settings") }, state = state, onRecord = { openRecordEntry(it) },
+                composable("records") { ReviewScreen(onSettings = { nav.navigate("settings") }, state = state, onRecord = { openRecordEntry(it) },
                     onPlan = { planStart = null; planEnd = null; planId = it },
                     onCreatePlan = { planSeed = null; planOccurrence = null; planStart = it.start.toEpochMilli(); planEnd = it.end.toEpochMilli(); planId = 0 },
                     onCreateRecord = { recordSeed = null; recordStart = it.start.toEpochMilli(); recordEnd = it.end.toEpochMilli(); draftPlanId = null; recordId = 0 },
@@ -222,7 +222,7 @@ fun ChronotaApp(themeMode: ThemeMode, onTheme: (ThemeMode) -> Unit, snackbar: Sn
                         onHistory = { model.perform { application.preferencesRepository.setHistory(it) } }, weekView = prefs.weekView, onWeekView = { model.perform { application.preferencesRepository.setWeekView(it) } },
 
                         timerPreferences = prefs, onDayStart = { model.perform { application.preferencesRepository.setDayStart(it) } }, onPreferCategory = { model.perform { application.preferencesRepository.setPreferCategory(it) } }, onLanguage = { model.perform { application.preferencesRepository.setLanguage(it) } }, onWeekStart = { model.perform { application.preferencesRepository.setWeekStart(it) } }, onTimerSettings = { mode, work, rest, cycles, done -> model.perform(done) { application.preferencesRepository.setTimer(mode, work, rest, cycles) } },
-                        onReviewCalendarPlans = { model.perform { application.preferencesRepository.setReviewCalendarPlans(it) } },
+                        onRecordsCalendarPlans = { model.perform { application.preferencesRepository.setRecordsCalendarPlans(it) } },
                         onMonthDetails = { model.perform { application.preferencesRepository.setMonthDetails(it) } },
                         onBackupExport = { exportFile.launch(application.backups.fileName()) },
                         onBackupImport = { importFile.launch(arrayOf("application/json", "text/plain", "*/*")) },

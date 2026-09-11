@@ -59,14 +59,14 @@ class AppNavigationTest {
         compose.onNodeWithTag("nav_today").assertDoesNotExist()
         compose.onNodeWithContentDescription(context.getString(R.string.back)).performClick()
         compose.onNodeWithTag("nav_settings").assertIsSelected()
-        compose.onNodeWithTag("nav_review").performClick().assertIsSelected()
+        compose.onNodeWithTag("nav_records").performClick().assertIsSelected()
         compose.onNodeWithTag("nav_settings").performClick()
         compose.onNodeWithText(context.getString(R.string.appearance)).performScrollTo().performClick()
         compose.onNodeWithTag("theme_DARK").performClick().assertIsSelected()
         saveScreenshot("settings-dark-en")
         compose.onNodeWithText("Confirm").performClick()
-        compose.onNodeWithTag("nav_review").performClick()
-        compose.onNodeWithTag("nav_review").assertIsSelected()
+        compose.onNodeWithTag("nav_records").performClick()
+        compose.onNodeWithTag("nav_records").assertIsSelected()
     }
 
     @Test

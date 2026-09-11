@@ -35,7 +35,7 @@ data class AppPreferences(
     val breakMinutes: Int = 5,
     val timerCycles: Int = 4,
     /** Whether the review calendar also draws plans. The plan calendar never draws records. */
-    val reviewCalendarPlans: Boolean = true,
+    val recordsCalendarPlans: Boolean = true,
     /** Whether the month pages spell out the details of their day cards. */
     val monthDetails: Boolean = true,
     /** Where WebDAV backups go and who they authenticate as. The password stays on this device. */
@@ -69,7 +69,7 @@ class PreferencesRepository(private val store: DataStore<Preferences>) {
     private val defaultsKey = booleanPreferencesKey("default_categories_v1")
     private val weekKey = booleanPreferencesKey("week_view")
     private val weekStartKey = intPreferencesKey("week_start")
-    private val reviewCalendarPlansKey = booleanPreferencesKey("review_calendar_plans")
+    private val recordsCalendarPlansKey = booleanPreferencesKey("records_calendar_plans")
     private val monthDetailsKey = booleanPreferencesKey("month_details")
     private val webDavUrlKey = stringPreferencesKey("webdav_url")
     private val webDavUserKey = stringPreferencesKey("webdav_user")
@@ -96,7 +96,7 @@ class PreferencesRepository(private val store: DataStore<Preferences>) {
             workMinutes = preferences[workKey] ?: 25,
             breakMinutes = preferences[breakKey] ?: 5,
             timerCycles = preferences[cyclesKey] ?: 4,
-            reviewCalendarPlans = preferences[reviewCalendarPlansKey] ?: true,
+            recordsCalendarPlans = preferences[recordsCalendarPlansKey] ?: true,
             monthDetails = preferences[monthDetailsKey] ?: true,
             webDavUrl = preferences[webDavUrlKey] ?: "",
             webDavUser = preferences[webDavUserKey] ?: "",
@@ -132,7 +132,7 @@ class PreferencesRepository(private val store: DataStore<Preferences>) {
     suspend fun setOrb(action: OrbAction) { store.edit { it[orbKey] = action.name } }
     suspend fun setSnap(minutes: Int) { require(minutes == 15 || minutes == 30); store.edit { it[snapKey] = minutes } }
     suspend fun setWeekView(value: Boolean) { store.edit { it[weekKey] = value } }
-    suspend fun setReviewCalendarPlans(value: Boolean) { store.edit { it[reviewCalendarPlansKey] = value } }
+    suspend fun setRecordsCalendarPlans(value: Boolean) { store.edit { it[recordsCalendarPlansKey] = value } }
     suspend fun setMonthDetails(value: Boolean) { store.edit { it[monthDetailsKey] = value } }
 
     /** Saves the WebDAV account and, when a run is enabled, forgets the previous attempt's outcome. */

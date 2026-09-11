@@ -24,7 +24,7 @@
 - Work in the milestone order in `docs/ROADMAP.md`. Build, run relevant tests,
   check regressions, and record evidence before advancing to the next milestone.
 - Keep a single app module; avoid speculative interfaces and use-case layers.
-- UI uses four primary tabs (Today, Plans, Review, Me), a floating glass dock, and an adjacent action orb. No fixed title bars on primary pages.
+- UI uses four primary tabs (Today, Plans, Records, Me), a floating glass dock, and an adjacent action orb. No fixed title bars on primary pages.
 - Match controls to their purpose: switches, plain inputs, radio/checkbox choices, chevrons for navigation, plus rows for adding, and centered colored save buttons. Secondary pages have a back/title banner. Keep colors flat without gradients or heavy shadows.
 - Elevation is reserved for surfaces that float above the page: the glass dock and the action orb use 2dp. Panels, cards and option rows are flat — a 1dp `outlineVariant` border plus a `surfaceContainer` fill separates them, never a shadow. Display-only lists omit the trailing chevron; keep it where the row navigates or edits.
 - Spacing follows the shared 4dp grid (4/8/12/16/24/32) and every size, radius, icon and stroke comes from `DesignTokens`. Do not add hard-coded dp values in feature code.

@@ -257,7 +257,7 @@ fun ModeTabs(labels: List<Int>, selected: Int, select: (Int) -> Unit, tag: Strin
     val zone = ZoneId.systemDefault()
     // What each calendar shows is a setting of its own now, so neither page spends a row on switches.
     val display = LocalDisplayPreferences.current
-    val showPlans = if (review) display.reviewCalendarPlans else true
+    val showPlans = if (review) display.recordsCalendarPlans else true
     // The plan calendar never draws records: a record belongs on the review side.
     val showRecords = review
     val pastPlans = !review

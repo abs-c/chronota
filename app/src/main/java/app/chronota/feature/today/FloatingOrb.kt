@@ -127,7 +127,7 @@ fun FloatingOrb(timer: TimerSession?, defaultAction: OrbAction, onAction: (OrbAc
 }
 
 fun OrbAction.icon() = when (this) {
-    OrbAction.PLAN -> AppIcons.Plan; OrbAction.RECORD -> AppIcons.Edit; OrbAction.INBOX -> AppIcons.Todo
+    OrbAction.PLAN -> AppIcons.Plan; OrbAction.RECORD -> AppIcons.Record; OrbAction.INBOX -> AppIcons.Todo
     OrbAction.GOAL -> AppIcons.Target
     OrbAction.TIMER -> AppIcons.Timer
 }

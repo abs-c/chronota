@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="today">今日</string>
-  <string name="review">回顾</string>
+  <string name="records_tab">记录</string>
   <string name="settings">设置</string>
   <string name="categories">分类</string>
   <string name="back">返回</string>
@@ -247,7 +247,7 @@
         <item quantity="other">有 %1$d 条已记录的数据属于这次修改要删掉的选项（或类型已不匹配），保存后会一并删除。</item>
     </plurals>
     <string name="week_start">一周开始于</string>
-    <string name="review_calendar_plans">回顾日历显示计划</string>
+    <string name="records_calendar_plans">记录日历显示计划</string>
     <string name="month_details">月历显示详情</string>
     <string name="settings_data">数据</string>
     <string name="settings_time">时间</string>

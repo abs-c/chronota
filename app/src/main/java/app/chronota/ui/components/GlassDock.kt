@@ -45,14 +45,14 @@ import app.chronota.ui.theme.*
 enum class Destination(val route: String, @param:StringRes @get:StringRes val label: Int, val icon: ImageVector) {
     TODAY("today", R.string.today, AppIcons.Today),
     TODO("todo", R.string.plans_tab, AppIcons.Plan),
-    REVIEW("review", R.string.review, AppIcons.Review),
+    RECORDS("records", R.string.records_tab, AppIcons.Record),
     MINE("settings", R.string.mine, AppIcons.Person),
 }
 
 @Composable
 fun GlassDock(route: String, navigate: (String) -> Unit, timer: TimerSession?, defaultAction: OrbAction,
     action: (OrbAction) -> Unit, openTimer: () -> Unit, backdrop: GraphicsLayer, backdropOrigin: Offset, onWheel: (Boolean) -> Unit = {}, overrideAction: OrbAction? = null) {
-    val pageAction = overrideAction ?: when (route) { "todo" -> OrbAction.PLAN; "review" -> OrbAction.RECORD; else -> defaultAction }
+    val pageAction = overrideAction ?: when (route) { "todo" -> OrbAction.PLAN; "records" -> OrbAction.RECORD; else -> defaultAction }
     val routes = Destination.entries.map { it.route }
     val labels = Destination.entries.map { it.label }
     val icons = Destination.entries.map { it.icon }
@@ -77,6 +77,6 @@ fun GlassDock(route: String, navigate: (String) -> Unit, timer: TimerSession?, d
                 }
             }
         }
-        FloatingOrb(timer, pageAction, action, openTimer, { wheelOpen = it; onWheel(it) }, backdrop, backdropOrigin, fixedAction = route in listOf("todo", "review"))
+        FloatingOrb(timer, pageAction, action, openTimer, { wheelOpen = it; onWheel(it) }, backdrop, backdropOrigin, fixedAction = route in listOf("todo", "records"))
     }
 }

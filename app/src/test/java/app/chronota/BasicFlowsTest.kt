@@ -15,8 +15,8 @@ import org.robolectric.annotation.GraphicsMode
 class BasicFlowsTest {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
     @Test fun manualRecordCanBeCreatedWithoutAPlan() {
-        compose.waitUntil(15_000) { compose.onAllNodesWithTag("nav_review").fetchSemanticsNodes().isNotEmpty() }
-        compose.onNodeWithTag("nav_review").performClick()
+        compose.waitUntil(15_000) { compose.onAllNodesWithTag("nav_records").fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithTag("nav_records").performClick()
         compose.onNodeWithTag("add_record").performClick()
         compose.waitUntil(15_000) { compose.onAllNodesWithTag("record_title").fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithTag("record_title").performTextInput("Unplanned walk")
