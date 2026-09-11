@@ -147,10 +147,11 @@ fun TodayScreen(onSettings: () -> Unit, state: WorkspaceState = WorkspaceState()
             if (showRecords && !singleColumn) Spacer(Modifier.weight(1f))
         }
         Spacer(Modifier.height(Space.xs))
-        // The timeline is this page's content, so on its own page it is a white sheet; the calendar's
-        // day view embeds it with showHeader = false, where that sheet already exists.
-        Box(if (showHeader) Modifier.weight(1f).padding(horizontal = Space.md, vertical = Space.xs).cardSurface(MaterialTheme.shapes.large) else Modifier.weight(1f)) {
-            Box(Modifier.fillMaxSize().topFade().verticalScroll(scroll).padding(top = Space.sm).padding(bottom = Metrics.dockClearance)) {
+        // The timeline is this page's content, so on its own page it is the white sheet that fills the
+        // page below the header; the calendar's day view embeds it with showHeader = false, where that
+        // sheet already exists.
+        Box(if (showHeader) Modifier.weight(1f).cardSurface(SheetShape) else Modifier.weight(1f)) {
+            Box(Modifier.fillMaxSize().topFade().verticalScroll(scroll).padding(horizontal = Space.md).padding(top = Space.sm).padding(bottom = Metrics.dockClearance)) {
                 Box(Modifier.fillMaxWidth().height(height)) {
                     val hours = (day.millis / 3_600_000).toInt()
                     repeat(hours + 1) { hour ->
@@ -159,7 +160,7 @@ fun TodayScreen(onSettings: () -> Unit, state: WorkspaceState = WorkspaceState()
                         // The gutter is sized for a clock time plus the raised "+1" marker, so the
                         // label holds its single line and stays clear of the blocks beside it.
                         if (hour < hours) Text(axisClockText(day.start.plusSeconds(hour * 3600L), date, zone),
-                            Modifier.offset(y = y).padding(start = Space.xxs, top = Space.xxs), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
+                            Modifier.offset(y = y).padding(top = Space.xxs), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
                     }
                     // Swiping over the events moves them; the hour gutter and grid stay put.
                     Row(Modifier.fillMaxSize().horizontalSwipe(

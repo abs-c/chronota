@@ -288,11 +288,11 @@ fun ModeTabs(labels: List<Int>, selected: Int, select: (Int) -> Unit, tag: Strin
         IconButton(onClick = { date = when (scale) { 0 -> date.plusDays(1); 1 -> date.plusWeeks(1); else -> date.plusMonths(1) } }) { Icon(AppIcons.Next, stringResource(R.string.next_period), Modifier.size(Metrics.icon)) }
     }
     when (scale) {
-        0 -> Box(Modifier.fillMaxSize().padding(horizontal = Space.md).cardSurface(MaterialTheme.shapes.large).testTag("calendar_day")) {
+        0 -> Box(Modifier.fillMaxSize().padding(top = Space.xs).cardSurface(SheetShape).testTag("calendar_day")) {
             TodayScreen({}, dayState, onPlan = { id, _ -> if (id != 0L) onPlan(id) else add(date) }, onRecord = { id, _ -> if (id != 0L) onRecord(id) else add(date) },
                 onCreatePlan = createPlan, onCreateRecord = createRecord, calendarCutoff = now, selectedDate = date, showHeader = false, showPlans = showPlans, showRecords = true, singleColumn = true)
         }
-        1 -> Column(Modifier.fillMaxSize().padding(horizontal = Space.md).cardSurface(MaterialTheme.shapes.large).testTag("calendar_week")) {
+        1 -> Column(Modifier.fillMaxSize().padding(top = Space.xs).cardSurface(SheetShape).testTag("calendar_week")) {
             // The weekday names are a fixed header. Below them a swipe anywhere turns the week, and
             // the dates and the blocks slide with it while the hour gutter on the left stays put, so
             // the numbers a swipe is read against never move.
@@ -351,7 +351,7 @@ fun ModeTabs(labels: List<Int>, selected: Int, select: (Int) -> Unit, tag: Strin
                     }
                 }
             }
-            Column(Modifier.fillMaxSize().padding(horizontal = Space.md).cardSurface(MaterialTheme.shapes.large)) {
+            Column(Modifier.fillMaxSize().padding(top = Space.xs).cardSurface(SheetShape)) {
                 val monthSwipe = rememberSwipeController()
                 Column(Modifier.weight(1f).swipeGestures(monthSwipe, { date = date.minusMonths(1) }, { date = date.plusMonths(1) })) {
                 Box(Modifier.fillMaxWidth().height(fullHeight + (collapsedHeight - fullHeight) * fraction).clipToBounds()
@@ -364,7 +364,7 @@ fun ModeTabs(labels: List<Int>, selected: Int, select: (Int) -> Unit, tag: Strin
                             fraction = (fraction - amount / maxCollapsePx).coerceIn(0f, 1f)
                         }
                     }
-                    ) { MonthGrid(date, entries, { date = it }, collapse = fraction, rowsModifier = Modifier.swipeTranslation(monthSwipe)) }
+                    ) { MonthGrid(date, entries, { date = it }, modifier = Modifier.padding(horizontal = Space.md), collapse = fraction, rowsModifier = Modifier.swipeTranslation(monthSwipe)) }
             LazyColumn(Modifier.weight(1f).swipeTranslation(monthSwipe).topFade().nestedScroll(connection).testTag("calendar_month"), state = listState, contentPadding = PaddingValues(start = Space.md, end = Space.md, top = Space.sm, bottom = Metrics.dockClearance), verticalArrangement = Arrangement.spacedBy(Space.xs)) {
                 val dayEntries = entries.filter { it.onDate(date, zone, dayStart) }.sortedBy { it.span?.start }
                 items(dayEntries, key = { it.key }) { entry -> AgendaCard(entry, state, showKind = true, details = display.monthDetails, showRange = true) { if (entry.isPlan) onPlan(entry.id) else onRecord(entry.id) } }

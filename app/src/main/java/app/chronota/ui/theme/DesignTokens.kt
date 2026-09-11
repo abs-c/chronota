@@ -3,6 +3,7 @@ package app.chronota.ui.theme
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.Typography
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -202,6 +203,13 @@ val ChronotaShapes = Shapes(
     large = largeRadius,
     extraLarge = largeRadius,
 )
+
+/**
+ * The white sheet that carries a page's main body — the calendar, the timeline. It runs the full
+ * width from the header band down past the bottom edge, with square corners: the gray above it and
+ * the 1dp lift at the seam are what say the page ends and its content begins.
+ */
+val SheetShape = RectangleShape
 
 /**
  * Digits keep one width — the "tnum" feature of whatever system font is running — so a column of
