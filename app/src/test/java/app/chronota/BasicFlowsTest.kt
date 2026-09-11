@@ -43,6 +43,8 @@ class BasicFlowsTest {
         compose.onNodeWithTag("plan_title").performTextReplacement("Read two chapters")
         compose.onNodeWithTag("save").performScrollTo().performClick()
         compose.waitUntil(15_000) { compose.onAllNodesWithTag("plan_title").fetchSemanticsNodes().isEmpty() }
+        // The renamed row reaches the list a frame after the editor closes, so wait for it.
+        compose.waitUntil(15_000) { compose.onAllNodesWithText("Read two chapters").fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithText("Read two chapters").performClick()
         compose.onNodeWithText("Delete").performScrollTo().performClick()
         compose.onNodeWithText("Confirm").performClick()

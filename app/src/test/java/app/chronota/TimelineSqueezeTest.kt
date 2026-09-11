@@ -29,8 +29,13 @@ import org.robolectric.annotation.GraphicsMode
 class TimelineSqueezeTest {
     @get:Rule val compose = createComposeRule()
 
+    /**
+     * The blocks sit a week out. The calendar draws only the plans that have not ended yet, so today's
+     * fixed hours would drop out of it as soon as the clock passed them; a week ahead is always still
+     * to come, and every test turns the calendar forward to that week.
+     */
     private fun state(vararg spans: Pair<LocalTime, LocalTime>): WorkspaceState {
-        val date = LocalDate.now()
+        val date = LocalDate.now().plusDays(7)
         return WorkspaceState(loading = false, plans = spans.mapIndexed { index, (start, end) ->
             Plan(id = index + 1L, title = "Block $index", scheduledDate = date, startTime = start, endTime = end, zoneId = ZoneId.systemDefault().id)
         })
@@ -49,6 +54,7 @@ class TimelineSqueezeTest {
         compose.setContent { ChronotaTheme(false) { BrowseScreen(true, state(LocalTime.of(9, 0) to LocalTime.of(9, 1), LocalTime.of(9, 12) to LocalTime.of(9, 13)), {}, {}, {}) } }
         compose.onNodeWithTag("browse_mode_1").performClick()
         compose.onNodeWithTag("calendar_scale_1").performClick()
+        compose.onNodeWithContentDescription("Next period").performClick()
         val blocks = blockRects().sortedBy { it.top }
         assertEquals(2, blocks.size)
         // Squeezed block: twelve minutes of room, not the twenty-minute minimum.
@@ -63,6 +69,7 @@ class TimelineSqueezeTest {
         compose.setContent { ChronotaTheme(false) { BrowseScreen(true, state(LocalTime.of(9, 0) to LocalTime.of(9, 5), LocalTime.of(9, 5) to LocalTime.of(9, 20)), {}, {}, {}) } }
         compose.onNodeWithTag("browse_mode_1").performClick()
         compose.onNodeWithTag("calendar_scale_1").performClick()
+        compose.onNodeWithContentDescription("Next period").performClick()
         val blocks = blockRects().sortedBy { it.top }
         assertEquals(2, blocks.size)
         // They share a lane — stacked, never side by side — and the front one still gets the floor.
@@ -77,6 +84,7 @@ class TimelineSqueezeTest {
         compose.setContent { ChronotaTheme(false) { BrowseScreen(true, state(LocalTime.of(9, 0) to LocalTime.of(9, 10), LocalTime.of(9, 5) to LocalTime.of(9, 15)), {}, {}, {}) } }
         compose.onNodeWithTag("browse_mode_1").performClick()
         compose.onNodeWithTag("calendar_scale_1").performClick()
+        compose.onNodeWithContentDescription("Next period").performClick()
         val blocks = blockRects().sortedBy { it.left }
         assertEquals(2, blocks.size)
         assertTrue(blocks[1].left > blocks[0].right - 1f)
@@ -90,6 +98,7 @@ class TimelineSqueezeTest {
             LocalTime.of(9, 5, 0) to LocalTime.of(9, 20)), {}, {}, {}) } }
         compose.onNodeWithTag("browse_mode_1").performClick()
         compose.onNodeWithTag("calendar_scale_1").performClick()
+        compose.onNodeWithContentDescription("Next period").performClick()
         val blocks = blockRects().sortedBy { it.top }
         assertEquals(2, blocks.size)
         assertEquals("seconds must not become a second column", blocks[0].left, blocks[1].left, 1f)
@@ -103,6 +112,7 @@ class TimelineSqueezeTest {
             LocalTime.of(9, 5, 0) to LocalTime.of(9, 20)), {}, {}, {}) } }
         compose.onNodeWithTag("browse_mode_1").performClick()
         compose.onNodeWithTag("calendar_scale_1").performClick()
+        compose.onNodeWithContentDescription("Next period").performClick()
         val blocks = blockRects().sortedBy { it.left }
         assertEquals(2, blocks.size)
         assertTrue(blocks[1].left > blocks[0].right - 1f)

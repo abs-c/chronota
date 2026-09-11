@@ -26,10 +26,15 @@ import org.robolectric.annotation.GraphicsMode
 class CalendarBlockSpacingTest {
     @get:Rule val compose = createComposeRule()
 
-    /** Six quarter-hour entries, some back to back and some overlapping, inside one hour. */
-    private fun state(): WorkspaceState {
+    /**
+     * Six quarter-hour entries, some back to back and some overlapping, inside one hour.
+     *
+     * [date] defaults to today for the timeline test. The calendar test asks for the same day a week
+     * back and turns the calendar back to it: the calendar keeps the records that have already
+     * started, so entries a week from now would not be drawn at all.
+     */
+    private fun state(date: LocalDate = LocalDate.now()): WorkspaceState {
         val zone = ZoneId.systemDefault()
-        val date = LocalDate.now()
         val start = date.atTime(10, 0).atZone(zone).toInstant()
         return WorkspaceState(loading = false,
             records = (0 until 6).map { index ->
@@ -63,9 +68,10 @@ class CalendarBlockSpacingTest {
     }
 
     @Test fun weekBlocksNeverTouch() {
-        compose.setContent { ChronotaTheme(false) { BrowseScreen(true, state(), {}, {}, {}) } }
+        compose.setContent { ChronotaTheme(false) { BrowseScreen(true, state(LocalDate.now().minusDays(7)), {}, {}, {}) } }
         compose.onNodeWithTag("browse_mode_1").performClick()
         compose.onNodeWithTag("calendar_scale_1").performClick()
+        compose.onNodeWithContentDescription("Previous period").performClick()
         compose.onNodeWithTag("calendar_week").assertExists()
         compose.waitForIdle()
         assertBlocksNeverTouch()
