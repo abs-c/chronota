@@ -53,6 +53,8 @@ object Metrics {
     val panelElevation = 0.dp
     val dialogElevation = 6.dp
     val floatingElevation = 2.dp
+    /** What a white sheet lifts off the grouped page by: a lift, not a drop shadow. */
+    val cardElevation = 1.dp
     const val switchScale = .7f
 
     // Strokes: hairline for floating glass edges, outline for flat panel/card borders.
@@ -201,13 +203,20 @@ val ChronotaShapes = Shapes(
     extraLarge = largeRadius,
 )
 
+/**
+ * Digits keep one width — the "tnum" feature of whatever system font is running — so a column of
+ * times or counts lines up and a running clock does not jitter. This is a font feature, not a
+ * monospaced family: the glyphs stay the system ones.
+ */
+private const val TabularFigures = "tnum"
+
 val ChronotaTypography = Typography(
-    headlineSmall = TextStyle(fontSize = 24.sp, lineHeight = 30.sp, fontWeight = FontWeight.SemiBold),
-    titleLarge = TextStyle(fontSize = 20.sp, lineHeight = 26.sp, fontWeight = FontWeight.SemiBold),
-    titleMedium = TextStyle(fontSize = 16.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium),
-    bodyLarge = TextStyle(fontSize = 14.sp, lineHeight = 20.sp),
-    bodyMedium = TextStyle(fontSize = 14.sp, lineHeight = 20.sp),
-    labelLarge = TextStyle(fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.Medium),
-    labelMedium = TextStyle(fontSize = 12.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium),
-    labelSmall = TextStyle(fontSize = 11.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium),
+    headlineSmall = TextStyle(fontSize = 24.sp, lineHeight = 30.sp, fontWeight = FontWeight.SemiBold, fontFeatureSettings = TabularFigures),
+    titleLarge = TextStyle(fontSize = 20.sp, lineHeight = 26.sp, fontWeight = FontWeight.SemiBold, fontFeatureSettings = TabularFigures),
+    titleMedium = TextStyle(fontSize = 16.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium, fontFeatureSettings = TabularFigures),
+    bodyLarge = TextStyle(fontSize = 14.sp, lineHeight = 20.sp, fontFeatureSettings = TabularFigures),
+    bodyMedium = TextStyle(fontSize = 14.sp, lineHeight = 20.sp, fontFeatureSettings = TabularFigures),
+    labelLarge = TextStyle(fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.Medium, fontFeatureSettings = TabularFigures),
+    labelMedium = TextStyle(fontSize = 12.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium, fontFeatureSettings = TabularFigures),
+    labelSmall = TextStyle(fontSize = 11.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium, fontFeatureSettings = TabularFigures),
 )

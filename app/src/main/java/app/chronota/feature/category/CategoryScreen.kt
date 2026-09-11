@@ -106,7 +106,7 @@ fun CategoryScreen(onBack: () -> Unit, model: WorkspaceViewModel = workspaceMode
                         .animateItem()
                         .graphicsLayer { if (dragging == parent.id) { translationY = dragDelta.y; alpha = .8f } }
                         .animateContentSize()
-                        .clip(MaterialTheme.shapes.small).background(MaterialTheme.colorScheme.surfaceContainer)) {
+                        .cardSurface()) {
                         Row(dragModifier(parent), verticalAlignment = Alignment.CenterVertically) {
                             OptionRow(parent.name, if (expanded) AppIcons.Down else AppIcons.Next, { expanded = !expanded }, Modifier.weight(1f), arrow = false)
                             IconButton(onClick = { editing = parent.id }) { Icon(AppIcons.Edit, stringResource(R.string.edit_group), Modifier.size(Metrics.icon)) }

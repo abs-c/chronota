@@ -181,8 +181,7 @@ fun ModeTabs(labels: List<Int>, selected: Int, select: (Int) -> Unit, tag: Strin
             else -> null
         },
     ).joinToString(" · ")
-    Row(Modifier.fillMaxWidth().clip(MaterialTheme.shapes.small)
-        .background(MaterialTheme.colorScheme.surfaceContainer)
+    Row(Modifier.fillMaxWidth().cardSurface()
         .testTag("agenda_card")
         .clickable(onClick = click).padding(horizontal = Space.md, vertical = Space.sm), verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(Space.sm)) {
         Box(Modifier.padding(top = Space.xxs)) { CategoryMark(category) }
@@ -289,11 +288,11 @@ fun ModeTabs(labels: List<Int>, selected: Int, select: (Int) -> Unit, tag: Strin
         IconButton(onClick = { date = when (scale) { 0 -> date.plusDays(1); 1 -> date.plusWeeks(1); else -> date.plusMonths(1) } }) { Icon(AppIcons.Next, stringResource(R.string.next_period), Modifier.size(Metrics.icon)) }
     }
     when (scale) {
-        0 -> Box(Modifier.fillMaxSize().testTag("calendar_day")) {
+        0 -> Box(Modifier.fillMaxSize().padding(horizontal = Space.md).cardSurface(MaterialTheme.shapes.large).testTag("calendar_day")) {
             TodayScreen({}, dayState, onPlan = { id, _ -> if (id != 0L) onPlan(id) else add(date) }, onRecord = { id, _ -> if (id != 0L) onRecord(id) else add(date) },
                 onCreatePlan = createPlan, onCreateRecord = createRecord, calendarCutoff = now, selectedDate = date, showHeader = false, showPlans = showPlans, showRecords = true, singleColumn = true)
         }
-        1 -> Column(Modifier.fillMaxSize().testTag("calendar_week")) {
+        1 -> Column(Modifier.fillMaxSize().padding(horizontal = Space.md).cardSurface(MaterialTheme.shapes.large).testTag("calendar_week")) {
             // The weekday names are a fixed header. Below them a swipe anywhere turns the week, and
             // the dates and the blocks slide with it while the hour gutter on the left stays put, so
             // the numbers a swipe is read against never move.
@@ -352,7 +351,7 @@ fun ModeTabs(labels: List<Int>, selected: Int, select: (Int) -> Unit, tag: Strin
                     }
                 }
             }
-            Column(Modifier.fillMaxSize()) {
+            Column(Modifier.fillMaxSize().padding(horizontal = Space.md).cardSurface(MaterialTheme.shapes.large)) {
                 val monthSwipe = rememberSwipeController()
                 Column(Modifier.weight(1f).swipeGestures(monthSwipe, { date = date.minusMonths(1) }, { date = date.plusMonths(1) })) {
                 Box(Modifier.fillMaxWidth().height(fullHeight + (collapsedHeight - fullHeight) * fraction).clipToBounds()

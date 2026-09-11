@@ -15,7 +15,7 @@ import app.chronota.R
 import app.chronota.ui.theme.*
 
 @Composable fun OptionGroup(content: @Composable ColumnScope.() -> Unit) {
-    Column(Modifier.fillMaxWidth().clip(MaterialTheme.shapes.small).background(MaterialTheme.colorScheme.surfaceContainer), content = content)
+    Column(Modifier.fillMaxWidth().cardSurface(), content = content)
 }
 @Composable fun OptionRow(title: String, icon: ImageVector?, onClick: () -> Unit, modifier: Modifier = Modifier,
     description: String? = null, enabled: Boolean = true, selected: Boolean = false,

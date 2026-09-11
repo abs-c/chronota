@@ -87,7 +87,7 @@ private data class GoalRecordRow(val name: String, val span: Pair<Instant, Insta
             Text(stringResource(R.string.goal_records), Modifier.weight(1f), style = MaterialTheme.typography.titleMedium)
             TextButton(onClick = onOpen) { Text(stringResource(R.string.details)) }
         }
-    Column(Modifier.fillMaxWidth().clip(MaterialTheme.shapes.small).background(MaterialTheme.colorScheme.surfaceContainer)
+    Column(Modifier.fillMaxWidth().cardSurface()
         .clickable(onClick = onOpen).padding(horizontal = Space.md, vertical = Space.sm), verticalArrangement = Arrangement.spacedBy(Space.sm)) {
         rows.forEachIndexed { index, row ->
             if (index > 0) AppDivider()
@@ -170,7 +170,7 @@ fun ExpiredGoals(state: WorkspaceState, categoryId: Long?, onBack: () -> Unit, o
     }
     val met = goal.direction == GoalDirection.AT_LEAST && actual >= goal.target
     val over = goal.direction == GoalDirection.AT_MOST && actual > goal.target
-    Column(modifier.fillMaxWidth().clip(MaterialTheme.shapes.small).background(MaterialTheme.colorScheme.surfaceContainer)
+    Column(modifier.fillMaxWidth().cardSurface()
         .padding(horizontal = Space.md, vertical = Space.sm), verticalArrangement = Arrangement.spacedBy(Space.xs)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Space.xs)) {
             CategoryMark(category)
@@ -213,7 +213,7 @@ fun ExpiredGoals(state: WorkspaceState, categoryId: Long?, onBack: () -> Unit, o
     val current = amountText(goal.metric, progress.current)
     val target = amountText(goal.metric, progress.target)
     val fraction = if (goal.target > 0) (progress.current.toFloat() / goal.target).coerceIn(0f, 1f) else 0f
-    Column(Modifier.fillMaxWidth().clip(MaterialTheme.shapes.small).background(MaterialTheme.colorScheme.surfaceContainer)
+    Column(Modifier.fillMaxWidth().cardSurface()
         .clickable(onClick = click).padding(horizontal = Space.md, vertical = Space.sm), verticalArrangement = Arrangement.spacedBy(Space.xs)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Space.xs)) {
             CategoryMark(category)

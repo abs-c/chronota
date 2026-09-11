@@ -147,7 +147,9 @@ fun TodayScreen(onSettings: () -> Unit, state: WorkspaceState = WorkspaceState()
             if (showRecords && !singleColumn) Spacer(Modifier.weight(1f))
         }
         Spacer(Modifier.height(Space.xs))
-        Box(Modifier.weight(1f)) {
+        // The timeline is this page's content, so on its own page it is a white sheet; the calendar's
+        // day view embeds it with showHeader = false, where that sheet already exists.
+        Box(if (showHeader) Modifier.weight(1f).padding(horizontal = Space.md, vertical = Space.xs).cardSurface(MaterialTheme.shapes.large) else Modifier.weight(1f)) {
             Box(Modifier.fillMaxSize().topFade().verticalScroll(scroll).padding(top = Space.sm).padding(bottom = Metrics.dockClearance)) {
                 Box(Modifier.fillMaxWidth().height(height)) {
                     val hours = (day.millis / 3_600_000).toInt()

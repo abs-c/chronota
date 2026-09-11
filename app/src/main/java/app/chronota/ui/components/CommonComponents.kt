@@ -130,7 +130,7 @@ fun AppFilterChip(selected: Boolean, onClick: () -> Unit, label: String, modifie
 /** iOS-style segmented control, shared by the page tabs and in-dialog switchers. */
 @Composable
 fun SegmentedTabs(labels: List<Int>, selected: Int, select: (Int) -> Unit, tag: String, modifier: Modifier = Modifier) {
-    Row(modifier.height(Metrics.segmentHeight).clip(MaterialTheme.shapes.small).background(MaterialTheme.colorScheme.surfaceContainer).padding(Space.xxs),
+    Row(modifier.height(Metrics.segmentHeight).clip(MaterialTheme.shapes.small).background(MaterialTheme.colorScheme.surfaceContainerHigh).padding(Space.xxs),
         horizontalArrangement = Arrangement.spacedBy(Space.xxs), verticalAlignment = Alignment.CenterVertically) {
         labels.forEachIndexed { i, label ->
             val active = i == selected

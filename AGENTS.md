@@ -26,12 +26,12 @@
 - Keep a single app module; avoid speculative interfaces and use-case layers.
 - UI uses four primary tabs (Today, Plans, Records, Me), a floating glass dock, and an adjacent action orb. No fixed title bars on primary pages.
 - Match controls to their purpose: switches, plain inputs, radio/checkbox choices, chevrons for navigation, plus rows for adding, and centered colored save buttons. Secondary pages have a back/title banner. Keep colors flat without gradients or heavy shadows.
-- Elevation is reserved for surfaces that float above the page: the glass dock and the action orb use 2dp. Panels, cards and option rows are flat — a 1dp `outlineVariant` border plus a `surfaceContainer` fill separates them, never a shadow. Display-only lists omit the trailing chevron; keep it where the row navigates or edits.
+- The page is a grouped gray and the content on it is white. Cards, row groups, the calendar, fields and chips are the white sheet, applied with the shared `cardSurface` modifier, which lifts 1dp off the page. Elevation beyond that is reserved for what floats: the glass dock and the action orb use 2dp. Display-only lists omit the trailing chevron; keep it where the row navigates or edits.
 - Spacing follows the shared 4dp grid (4/8/12/16/24/32) and every size, radius, icon and stroke comes from `DesignTokens`. Do not add hard-coded dp values in feature code.
 - Controls and tappable rows are at least 48dp high. Dense timeline blocks and heat-map cells are the only documented exceptions and keep their compact visual height.
 - Editors and nested selections use solid central panels with consistent dimming. Keep controls 48dp high, dock and orb 56dp high, and use rounded icon strokes. Category defaults must merge without overwriting user data.
 - Recurring plans store only their rule; occurrences are expanded by centralized domain logic and never duplicated into the database.
-- Use system fonts without an explicit font family. Use shared spacing, color,
+- Use system fonts without an explicit font family. Numbers use tabular figures through the shared typography tokens, never a monospaced family. Use shared spacing, color,
   shape, typography, and icon tokens. Support light and dark together.
 - Use `Instant` for actual events; preserve local calendar semantics for Plans.
 - Never manufacture sample history in the production database.

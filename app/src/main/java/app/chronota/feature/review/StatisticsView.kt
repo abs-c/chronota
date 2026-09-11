@@ -130,7 +130,7 @@ private const val OVERVIEW_PAGES = 2001
 
 @Composable private fun CategoryCard(category: Category, group: Category?, values: Map<LocalDate, Long>, week: Long, total: Long, count: Int,
     today: LocalDate, heatStart: LocalDate, accent: Color, click: () -> Unit) {
-    Row(Modifier.fillMaxWidth().clip(MaterialTheme.shapes.small).background(MaterialTheme.colorScheme.surfaceContainer)
+    Row(Modifier.fillMaxWidth().cardSurface()
         .clickable(onClick = click).padding(horizontal = Space.md, vertical = Space.sm), horizontalArrangement = Arrangement.spacedBy(Space.md), verticalAlignment = Alignment.CenterVertically) {
         Heatmap(values, heatStart, today, accent, Metrics.heatmapCell)
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Space.xxs)) {
@@ -230,7 +230,7 @@ private const val OVERVIEW_PAGES = 2001
                     }
                 }
             }
-            Column(Modifier.fillMaxWidth().clip(MaterialTheme.shapes.small).background(MaterialTheme.colorScheme.surfaceContainer).padding(horizontal = Space.md, vertical = Space.sm), verticalArrangement = Arrangement.spacedBy(Space.sm)) {
+            Column(Modifier.fillMaxWidth().cardSurface().padding(horizontal = Space.md, vertical = Space.sm), verticalArrangement = Arrangement.spacedBy(Space.sm)) {
                 DailyBarChart(chartValues, accent)
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Space.md), verticalAlignment = Alignment.Top) {
                     Heatmap(values, heatStart, today, accent, Metrics.heatmapCellLarge)
@@ -269,14 +269,14 @@ private data class Summary(val label: Int, val millis: Long, val countText: Stri
 private fun Record.overlaps(span: TimeSpan): Boolean = startTime < span.end && (endTime > span.start || startTime >= span.start)
 
 @Composable private fun SummaryTile(label: String, value: String, modifier: Modifier = Modifier) {
-    Column(modifier.clip(MaterialTheme.shapes.small).background(MaterialTheme.colorScheme.surfaceContainer).padding(Space.sm), verticalArrangement = Arrangement.spacedBy(Space.xxs)) {
+    Column(modifier.cardSurface().padding(Space.sm), verticalArrangement = Arrangement.spacedBy(Space.xxs)) {
         Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
         Text(value, style = MaterialTheme.typography.labelLarge, maxLines = 1)
     }
 }
 
 @Composable private fun AttributeStatCard(stat: AttributeStat, accent: Color) {
-    Column(Modifier.fillMaxWidth().clip(MaterialTheme.shapes.small).background(MaterialTheme.colorScheme.surfaceContainer).padding(horizontal = Space.md, vertical = Space.sm), verticalArrangement = Arrangement.spacedBy(Space.xs)) {
+    Column(Modifier.fillMaxWidth().cardSurface().padding(horizontal = Space.md, vertical = Space.sm), verticalArrangement = Arrangement.spacedBy(Space.xs)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(stat.definition.name, Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
             Text(pluralStringResource(R.plurals.attribute_filled, stat.filled, stat.filled), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
