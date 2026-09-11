@@ -42,6 +42,8 @@ android {
         disable += "AndroidGradlePluginVersion"
         disable += "NewerVersionAvailable"
         disable += "GradleDependency"
+        // targetSdk is pinned deliberately; a runner that ships a newer platform should not fail the build.
+        disable += "OldTargetApi"
     }
 }
 
