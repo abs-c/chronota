@@ -34,8 +34,6 @@ private const val BandGlassEnabled = true
  */
 private const val SolidFraction = .3f
 
-/** Where the glass has reached its full strength (310px of 374px on the emulator). */
-private const val ClearFraction = .8f
 
 /** The grey's alpha once it is fully glass: a tenth, so the schedule reads straight through. */
 private const val BandTint = .1f
@@ -123,7 +121,6 @@ fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() 
                 Brush.verticalGradient(
                     0f to base,
                     SolidFraction to base,
-                    ClearFraction to base.copy(alpha = BandTint),
                     1f to base.copy(alpha = BandTint),
                     startY = 0f,
                     endY = end,
