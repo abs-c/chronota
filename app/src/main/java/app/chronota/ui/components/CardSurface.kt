@@ -38,30 +38,6 @@ private val SheetShadow = Color.Black.copy(alpha = .07f)
 @Composable fun Modifier.sheetSurface(): Modifier = cardSurface(SheetShape, 0.dp)
 
 /**
- * The date band at the top of a timeline. It cannot sample the page backdrop the way the dock does —
- * the band sits inside the page that backdrop is recorded from, so asking for it again recurses — and
- * on a flat grouped page there is nothing under the band to refract anyway. What reads as glass here
- * is the frost and the edge: a breath of the surface colour, strongest at the seam and gone by the
- * middle of the band, over a lower edge that fades out at both ends.
- */
-@Composable fun Modifier.glassBand(): Modifier {
-    val lift = MaterialTheme.colorScheme.surfaceContainer
-    val edge = MaterialTheme.colorScheme.outlineVariant
-    return this
-        .background(Brush.verticalGradient(0f to lift.copy(alpha = 0f), .5f to lift.copy(alpha = 0f), 1f to lift.copy(alpha = .6f)))
-        .drawWithContent {
-            drawContent()
-            val hairline = Metrics.hairline.toPx()
-            drawLine(
-                brush = Brush.horizontalGradient(listOf(Color.Transparent, edge.copy(alpha = .75f), Color.Transparent)),
-                start = Offset(0f, size.height - hairline / 2f),
-                end = Offset(size.width, size.height - hairline / 2f),
-                strokeWidth = hairline,
-            )
-        }
-}
-
-/**
  * The edge of a glass surface: a ring lit at the top and fading away at the bottom, drawn along the
  * shape rather than as a line, so the pill of the dock and the disc of the orb both get the right edge.
  */

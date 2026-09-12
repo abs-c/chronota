@@ -83,27 +83,29 @@ fun TodayScreen(onSettings: () -> Unit, state: WorkspaceState = WorkspaceState()
         scroll.scrollTo(with(density) { (hourHeight * hours).roundToPx() })
     }
     if (chooseDate) CalendarDialog(stringResource(R.string.date), date, { chooseDate = false }) { date = it; chooseDate = false }
-    // The date band keeps the grouped page; the schedule under it is the page's body, a white sheet
-    // whose top edge the band's shadow falls across.
     PageColumn() {
-        if (showHeader) Column(Modifier.fillMaxWidth().glassBand().padding(bottom = Space.xs)) {
+        // The band is the middle layer: gray where nothing is under it, glass where the schedule
+        // scrolls beneath it. It carries the title and, when the setting is on, the week strip.
         val locale = androidx.compose.ui.platform.LocalResources.current.configuration.locales[0]
         val monthPattern = if (locale.language == "zh") "yyyy 年 M 月" else "MMMM yyyy"
-        Row(Modifier.fillMaxWidth().padding(start = Space.md, top = Space.xxs, end = Space.md), verticalAlignment = Alignment.CenterVertically) {
-            // The title is its own rounded touch target, so the press reads as a control instead of a
-            // hard-cornered band the width of the row.
-            Row(Modifier.height(Metrics.touchTarget).padding(horizontal = Space.xs).clip(MaterialTheme.shapes.small).clickable { chooseDate = true }, verticalAlignment = Alignment.CenterVertically) {
-                Text(if (weekView) date.format(DateTimeFormatter.ofPattern(monthPattern, locale)) else dateText(date),
-                    style = MaterialTheme.typography.titleLarge)
+        val band: @Composable () -> Unit = {
+            Column(Modifier.fillMaxWidth().padding(bottom = Space.xs)) {
+                Row(Modifier.fillMaxWidth().padding(start = Space.md, top = Space.xxs, end = Space.md), verticalAlignment = Alignment.CenterVertically) {
+                    // The title is its own rounded touch target, so the press reads as a control instead
+                    // of a hard-cornered band the width of the row.
+                    Row(Modifier.height(Metrics.touchTarget).padding(horizontal = Space.xs).clip(MaterialTheme.shapes.small).clickable { chooseDate = true }, verticalAlignment = Alignment.CenterVertically) {
+                        Text(if (weekView) date.format(DateTimeFormatter.ofPattern(monthPattern, locale)) else dateText(date), style = MaterialTheme.typography.titleLarge)
+                    }
+                    Spacer(Modifier.weight(1f))
+                    if (weekView || date != logicalDate(now, zone, dayStart)) TextButton(onClick = { date = logicalDate(Instant.now(), dayStartMinutes = dayStart) }, modifier = Modifier.testTag("jump_today")) { Text(stringResource(R.string.today)) }
+                }
+                // The same strip the calendar's day view draws, so both turn the week the same way.
+                if (weekView) WeekStrip(date, preferences.weekStart, { date = it }, { date = date.minusWeeks(1) }, { date = date.plusWeeks(1) })
             }
-            Spacer(Modifier.weight(1f))
-            if (weekView || date != logicalDate(now, zone, dayStart)) TextButton(onClick = { date = logicalDate(Instant.now(), dayStartMinutes = dayStart) }, modifier = Modifier.testTag("jump_today")) { Text(stringResource(R.string.today)) }
         }
-        // The same strip the calendar's day view draws, so both turn the week the same way.
-        if (weekView) WeekStrip(date, preferences.weekStart, { date = it }, { date = date.minusWeeks(1) }, { date = date.plusWeeks(1) })
-        }
-        Box(if (showHeader) Modifier.weight(1f).sheetSurface() else Modifier.weight(1f)) {
-            Column(Modifier.fillMaxSize()) {
+        // The body is the bottom layer: the white sheet with the lane labels, the all-day chips and the
+        // hours. On the calendar's day view it is drawn by the calendar, which owns the band there.
+        val schedule: @Composable ColumnScope.() -> Unit = {
         if (!singleColumn) Row(Modifier.fillMaxWidth().padding(vertical = Space.xxs)) {
             if (showPlans) Box(Modifier.weight(1f).padding(start = Metrics.timelineGutter)) { Text(stringResource(R.string.plan), style = MaterialTheme.typography.labelMedium) }
             if (showRecords) Box(Modifier.weight(1f).padding(start = if (showPlans) Space.xs else Metrics.timelineGutter)) { Text(stringResource(R.string.record), style = MaterialTheme.typography.labelMedium) }
@@ -186,8 +188,9 @@ fun TodayScreen(onSettings: () -> Unit, state: WorkspaceState = WorkspaceState()
             }
             Box(Modifier.align(Alignment.BottomEnd).padding(Space.md)) { orb() }
         }
-            }
         }
+        if (showHeader) FloatingBand(band = band, body = schedule)
+        else Box(Modifier.weight(1f)) { Column(Modifier.fillMaxSize(), content = schedule) }
     }
 }
 

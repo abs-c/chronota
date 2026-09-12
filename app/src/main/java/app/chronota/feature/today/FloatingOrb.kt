@@ -94,17 +94,15 @@ fun FloatingOrb(timer: TimerSession?, defaultAction: OrbAction, onAction: (OrbAc
         // No panel behind the elapsed time: it reads straight on the page.
         if (timer != null && !expanded) Text(timerElapsedText(timer.elapsed(now)),
             Modifier.align(Alignment.TopEnd).offset(y = -Metrics.orb / 2), style = MaterialTheme.typography.labelMedium)
-        Box(Modifier.size(Metrics.orb).graphicsLayer { scaleX = pressScale; scaleY = pressScale }.shadow(Metrics.floatingElevation, CircleShape, ambientColor = Color.Black.copy(alpha = .10f), spotColor = Color.Black.copy(alpha = .16f)).clip(CircleShape)
-            .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.primary, tintAlpha = .82f)
+        Box(Modifier.size(Metrics.orb).graphicsLayer { scaleX = pressScale; scaleY = pressScale }.shadow(Metrics.floatingElevation, CircleShape, ambientColor = Color.Black.copy(alpha = .06f), spotColor = Color.Black.copy(alpha = .10f)).clip(CircleShape)
+            // Clear glass rather than a painted disc: the page reads through the tint, the top edge
+            // catches the light, and nothing shouts for attention.
+            .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.primary, tintAlpha = .5f)
             .drawWithContent {
                 drawContent()
-                // A drop's sheen: the light catches the upper left, and the rim is lit from the top.
-                drawCircle(brush = Brush.radialGradient(listOf(Color.White.copy(alpha = .38f), Color.White.copy(alpha = .05f), Color.Transparent),
-                    center = Offset(size.width * .34f, size.height * .28f), radius = size.minDimension * .78f))
-                val width = Metrics.hairline.toPx()
-                drawCircle(brush = Brush.verticalGradient(listOf(Color.White.copy(alpha = .55f), Color.White.copy(alpha = .06f))),
-                    radius = size.minDimension / 2f - width / 2f, style = Stroke(width))
+                drawRect(Brush.verticalGradient(listOf(Color.White.copy(alpha = .28f), Color.White.copy(alpha = .03f), Color.Transparent, Color.Black.copy(alpha = .04f))))
             }
+            .border(Metrics.hairline, Brush.verticalGradient(listOf(Color.White.copy(alpha = .75f), Color.White.copy(alpha = .10f))), CircleShape)
             .semantics { contentDescription = description; role = Role.Button; onClick { tap(); true }; onLongClick { expanded = true; true } }
             .testTag(if (fixedAction) if (defaultAction == OrbAction.PLAN) "add_plan" else "add_record" else "orb_primary").pointerInput(defaultAction, timer?.token, fixedAction) {
                 awaitEachGesture {
