@@ -34,6 +34,14 @@ private const val BandGlassEnabled = true
  */
 private const val SolidFraction = .3f
 
+/**
+ * The band's alpha as it thins: one at the baseline, the floor at the lower edge, eased at both
+ * ends. `eased` runs 0 there and 1 at the lower edge, following a smoothstep — so the ramp leaves the
+ * header flat, without the corner a straight line would put there, and arrives at the floor flat too.
+ * It changes nothing about the floor itself.
+ */
+private fun bandAlpha(eased: Float): Float = 1f - (1f - BandTint) * eased
+
 
 /** The grey's alpha once it is fully glass: a tenth, so the schedule reads straight through. */
 private const val BandTint = .3f
@@ -117,16 +125,23 @@ fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() 
             // The band is the page's grey and nothing else.
             drawRect(base)
         } else {
-            // The grey the band has always been: solid down to the title's baseline, then thinning —
-            // 1.0 down to a tenth — until it is fully glass, and glass the rest of the way to the
-            // lower edge. So the band comes out of its opaque header, becomes a window on the
-            // schedule, and ends as clear pane over the sheet.
+            // The grey the band has always been: solid down to the title's baseline, then thinning, then
+            // glass — with the floor at 30% kept all the way to the lower edge. The thinning is eased
+            // rather than straight: a straight ramp leaves the flat header in a corner, a change of
+            // slope with no change of value, and the eye draws that corner as a line across the band.
+            // On a dark page the ramp has twice as far to fall, so the same corner is twice as loud.
             val end = size.height.coerceAtLeast(1f)
             drawRect(
                 Brush.verticalGradient(
                     0f to base,
                     SolidFraction to base,
-                    1f to base.copy(alpha = BandTint),
+                    .405f to base.copy(alpha = bandAlpha(.0608f)),
+                    .51f to base.copy(alpha = bandAlpha(.216f)),
+                    .615f to base.copy(alpha = bandAlpha(.4252f)),
+                    .685f to base.copy(alpha = bandAlpha(.5757f)),
+                    .79f to base.copy(alpha = bandAlpha(.7840f)),
+                    .895f to base.copy(alpha = bandAlpha(.9392f)),
+                    1f to base.copy(alpha = bandAlpha(1f)),
                     startY = 0f,
                     endY = end,
                 )
