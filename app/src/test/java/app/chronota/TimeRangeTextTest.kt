@@ -4,6 +4,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.text.AnnotatedString
 import app.chronota.domain.TimeSpan
 import app.chronota.ui.components.axisClockText
+import app.chronota.ui.components.axisHourNumberText
 import app.chronota.ui.components.axisHourText
 import app.chronota.ui.components.axisRangeEndsText
 import app.chronota.ui.components.rangeEndsText
@@ -72,22 +73,19 @@ class TimeRangeTextTest {
         assertEquals("20:42", clock?.text)
     }
 
-    /** The week gutter and the day gutter are the same column, down to the next-date marker. */
-    @Test fun theWeekAndDayGuttersReadAlike() {
-        var day: AnnotatedString? = null
-        var week: AnnotatedString? = null
-        var dayNext: AnnotatedString? = null
-        var weekNext: AnnotatedString? = null
+    /**
+     * The week gutter keeps the bare hour: seven day columns need the width the minutes would take.
+     * Only the line under the label is drawn the way the day view draws it.
+     */
+    @Test fun theWeekGutterDropsTheMinutesAndStillMarksTheNextDate() {
+        var hour: AnnotatedString? = null
+        var next: AnnotatedString? = null
         compose.setContent {
-            day = axisClockText(Instant.parse("2026-09-10T20:00:00Z"), LocalDate.of(2026, 9, 10), ZoneOffset.UTC)
-            week = axisHourText(LocalTime.of(20, 0), 0)
-            dayNext = axisClockText(Instant.parse("2026-09-11T02:00:00Z"), LocalDate.of(2026, 9, 10), ZoneOffset.UTC)
-            weekNext = axisHourText(LocalTime.of(2, 0), 240)
+            hour = axisHourNumberText(LocalTime.of(20, 0), 240)
+            next = axisHourNumberText(LocalTime.of(2, 0), 240)
         }
-        assertEquals("20:00", day?.text)
-        assertEquals(day?.text, week?.text)
-        assertEquals("02:00 +1", dayNext?.text)
-        assertEquals(dayNext?.text, weekNext?.text)
+        assertEquals("20", hour?.text)
+        assertEquals("02 +1", next?.text)
     }
 
     /** An agenda row's two ends: dates when it crosses a day, a raised "+1" when it does not. */

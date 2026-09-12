@@ -120,6 +120,16 @@ fun timeText(value: Instant, zone: ZoneId = ZoneId.systemDefault()): String = va
     return withNextDayMarker(hour.format(DateTimeFormatter.ofPattern("HH:mm")), hour < dayStart)
 }
 
+/**
+ * The week's hour gutter. Every label down that column is a whole hour, so the minutes are dropped:
+ * "04" instead of "04:00" hands the seven day columns visibly more room. Only the marker is the same
+ * as the day view's; the line under each label is drawn the same way in both.
+ */
+@Composable fun axisHourNumberText(hour: LocalTime, dayStartMinutes: Int): AnnotatedString {
+    val dayStart = LocalTime.ofSecondOfDay(dayStartMinutes.coerceIn(0, 1439) * 60L)
+    return withNextDayMarker(hour.format(DateTimeFormatter.ofPattern("HH")), hour < dayStart)
+}
+
 /** The clock time, with the next-date marker set smaller and raised so it reads as a footnote. */
 @Composable fun withNextDayMarker(text: String, nextDate: Boolean): AnnotatedString {
     val marker = stringResource(R.string.day_offset_suffix, 1)

@@ -58,6 +58,8 @@ object Metrics {
     val cardElevation = 1.dp
     /** A page's body lifts a little more, so the gray above it fades into the sheet instead of ending at an edge. */
     val sheetElevation = 3.dp
+    /** How far the shadow under a band fades down the content below it. */
+    val seamFade = 14.dp
     /** A menu is opaque, so it needs a little more than the sheets to sit above them. */
     val menuElevation = 4.dp
     const val switchScale = .7f
@@ -150,10 +152,12 @@ object Metrics {
     /** Gap between a start and an end time, kept tight: they read as one range, not two rows. */
     val agendaTimeGap = 2.dp
     /**
-     * The week's hour gutter. It is the day view's column, label for label ("04:00" with the raised
-     * marker), so the two grids read as the same axis; the seven day columns take what is left.
+     * The week's hour gutter. Its labels are hour numbers rather than clock times, which is what lets
+     * it stay this narrow and hand the width to the seven day columns — but it still has to hold the
+     * marked form ("04" plus the raised marker). The hour line under each label is drawn the same way
+     * as the day view's, right across the gutter.
      */
-    val weekGutter = timelineGutter
+    val weekGutter = Space.xl
     val calendarCell = 44.dp
     val calendarDay = 36.dp
     val monthDay = 44.dp

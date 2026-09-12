@@ -83,13 +83,10 @@ fun TodayScreen(onSettings: () -> Unit, state: WorkspaceState = WorkspaceState()
         scroll.scrollTo(with(density) { (hourHeight * hours).roundToPx() })
     }
     if (chooseDate) CalendarDialog(stringResource(R.string.date), date, { chooseDate = false }) { date = it; chooseDate = false }
-    // A plain canvas page: the day is one continuous sheet of paper, so it paints the system
-    // background itself instead of sitting on the grouped gray. Only the header band is separated,
-    // by a hairline rather than by a change of color.
-    PageColumn(Modifier.background(MaterialTheme.colorScheme.surface)) {
-        // The date band keeps the grouped background and casts the seam the paper slides under; the
-        // schedule below it is the plain page.
-        if (showHeader) Column(Modifier.fillMaxWidth().bandSurface().padding(bottom = Space.xs)) {
+    // The date band keeps the grouped page; the schedule under it is the page's body, a white sheet
+    // whose top edge the band's shadow falls across.
+    PageColumn() {
+        if (showHeader) Column(Modifier.fillMaxWidth().padding(bottom = Space.xs)) {
         val locale = androidx.compose.ui.platform.LocalResources.current.configuration.locales[0]
         val monthPattern = if (locale.language == "zh") "yyyy 年 M 月" else "MMMM yyyy"
         Row(Modifier.fillMaxWidth().padding(start = Space.md, top = Space.xxs, end = Space.md), verticalAlignment = Alignment.CenterVertically) {
@@ -105,6 +102,8 @@ fun TodayScreen(onSettings: () -> Unit, state: WorkspaceState = WorkspaceState()
         // The same strip the calendar's day view draws, so both turn the week the same way.
         if (weekView) WeekStrip(date, preferences.weekStart, { date = it }, { date = date.minusWeeks(1) }, { date = date.plusWeeks(1) })
         }
+        Box(if (showHeader) Modifier.weight(1f).sheetSurface().seamShadow() else Modifier.weight(1f)) {
+            Column(Modifier.fillMaxSize()) {
         if (!singleColumn) Row(Modifier.fillMaxWidth().padding(vertical = Space.xxs)) {
             if (showPlans) Box(Modifier.weight(1f).padding(start = Metrics.timelineGutter)) { Text(stringResource(R.string.plan), style = MaterialTheme.typography.labelMedium) }
             if (showRecords) Box(Modifier.weight(1f).padding(start = if (showPlans) Space.xs else Metrics.timelineGutter)) { Text(stringResource(R.string.record), style = MaterialTheme.typography.labelMedium) }
@@ -186,6 +185,8 @@ fun TodayScreen(onSettings: () -> Unit, state: WorkspaceState = WorkspaceState()
                 }
             }
             Box(Modifier.align(Alignment.BottomEnd).padding(Space.md)) { orb() }
+        }
+            }
         }
     }
 }
