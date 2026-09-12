@@ -64,6 +64,7 @@ fun FloatingOrb(timer: TimerSession?, defaultAction: OrbAction, onAction: (OrbAc
     var now by remember { mutableStateOf(Instant.now()) }
     val haptic = LocalHapticFeedback.current
     val density = LocalDensity.current
+    val lighting = glassLighting()
     val actionCallback by rememberUpdatedState(onAction)
     val timerCallback by rememberUpdatedState(onTimer)
     val radius = with(density) { Metrics.wheelRadius.toPx() }
@@ -79,13 +80,24 @@ fun FloatingOrb(timer: TimerSession?, defaultAction: OrbAction, onAction: (OrbAc
                     val angle = Math.toRadians(wheelAngle(index))
                     val selected = highlighted == action
                     Column(Modifier.align(Alignment.BottomEnd).offset { IntOffset((-radius * expansion * cos(angle)).roundToInt(), (-radius * expansion * sin(angle)).roundToInt()) }
-                        .size(Metrics.orb).graphicsLayer { alpha = expansion.coerceIn(0f, 1f); scaleX = .7f + .3f * expansion; scaleY = scaleX }.clip(CircleShape).glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.surfaceContainerHigh, tintAlpha = .16f).background(if (selected) MaterialTheme.colorScheme.primary.copy(alpha = .8f) else Color.Transparent).glassRing()
+                        .size(Metrics.orb).graphicsLayer { alpha = expansion.coerceIn(0f, 1f); scaleX = .7f + .3f * expansion; scaleY = scaleX }.clip(CircleShape)
+                        // The orb's own material, without its stain: same body, same light, same shade,
+                        // same rim. Which action is under the finger is said by the icon and the label,
+                        // the way the dock says which page you are on — not by a disc of colour laid over
+                        // the glass, which is louder than anything else on the page.
+                        .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.surfaceContainerHigh, tintAlpha = .18f)
+                        .drawWithContent {
+                            drawContent()
+                            drawRect(diagonalLight(size, listOf(Color.White.copy(alpha = .10f * lighting.light), Color.Transparent)))
+                            drawRect(diagonalLight(size, listOf(Color.Transparent, Color.Black.copy(alpha = .025f * lighting.shade))))
+                        }
+                        .glassRing()
                         .testTag("wheel_${action.name}")
                         .semantics { onClick { execute(action); true } }, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                         TextButton(onClick = { execute(action) }, contentPadding = PaddingValues(), modifier = Modifier.fillMaxSize()) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Icon(action.icon(), null, Modifier.size(Metrics.icon), tint = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface)
-                                Text(stringResource(action.label()), style = MaterialTheme.typography.labelMedium, color = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
+                                Icon(action.icon(), null, Modifier.size(Metrics.icon), tint = if (selected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface)
+                                Text(stringResource(action.label()), style = MaterialTheme.typography.labelMedium, color = if (selected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface,
                                     textAlign = androidx.compose.ui.text.style.TextAlign.Center, maxLines = 2)
                             }
                         }
@@ -99,7 +111,6 @@ fun FloatingOrb(timer: TimerSession?, defaultAction: OrbAction, onAction: (OrbAc
         // The dock's material, plus one thin stain of the theme colour. Same body, same light, same
         // direction as every other piece of glass on the page.
         val stain = MaterialTheme.colorScheme.primary
-        val lighting = glassLighting()
         Box(Modifier.size(Metrics.orb).graphicsLayer { scaleX = pressScale; scaleY = pressScale }.clip(CircleShape)
             .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.surfaceContainerHigh, tintAlpha = .18f)
             .drawWithContent {
