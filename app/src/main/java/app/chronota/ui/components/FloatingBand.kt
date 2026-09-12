@@ -70,24 +70,30 @@ fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() 
     val density = LocalDensity.current
     val solidLine = remember { mutableFloatStateOf(Float.NaN) }
     val reportSolidLine = remember { { y: Float -> solidLine.floatValue = y } }
+    // Where the sampled layer was recorded from, in root coordinates, reported by the box that records
+    // it. Kept in state and read at draw time: a plain local written by a layout callback still holds
+    // its initial zero when the band composes, and the offset that yields is not the layer-to-glass
+    // distance but the band's distance from the top of the window — the status bar, in the views that
+    // are inset. The band and the body occupy the same point, so the offset is zero, and it is zero
+    // because it is measured rather than because the two mistakes cancel.
+    val backdropOrigin = remember { mutableStateOf(Offset.Zero) }
     // One measurement for both: the band is measured first, so the body can be laid out and the glass
     // drawn against a height that is already real. The alternative — measure, hold the height in state,
     // recompose — draws one frame where the height is still zero, and a gradient over zero pixels is
     // not a gradient: every pixel clamps to its last stop, which is the band as a flat slab of its
     // floor colour. That frame is what a screenshot catches and what the eye catches on the way in.
     SubcomposeLayout { constraints ->
-        var origin = Offset.Zero
         val solidRoot = solidLine.floatValue
         val bandPlaceable = subcompose(BandSlot) {
             CompositionLocalProvider(LocalBandSolidLine provides reportSolidLine) {
-                Box(Modifier.fillMaxWidth().onGloballyPositioned { origin = it.positionInRoot() }.clipToBounds().glassBand(layer, origin, solidRoot)) { band() }
+                Box(Modifier.fillMaxWidth().clipToBounds().glassBand(layer, backdropOrigin, solidRoot)) { band() }
             }
         }.first().measure(constraints.copy(minHeight = 0))
         val bandPx = bandPlaceable.height
         val bodyFrom = if (BandGlassEnabled && BandTint < 1f) SolidFraction else 1f
         val bandDp = with(density) { bandPx.toDp() }
         val bodyPlaceable = subcompose(BodySlot) {
-            Box(Modifier.fillMaxSize().drawWithContent { layer.record { this@drawWithContent.drawContent() }; drawLayer(layer) }) {
+            Box(Modifier.fillMaxSize().onGloballyPositioned { backdropOrigin.value = it.positionInRoot() }.drawWithContent { layer.record { this@drawWithContent.drawContent() }; drawLayer(layer) }) {
                 Column(Modifier.fillMaxSize().sheetSurface()) {
                     Spacer(Modifier.height(bandDp * bodyFrom))
                     // A scroll inside is told how much of the band it begins under, so it can rest its
@@ -116,7 +122,7 @@ private object BodySlot
  * carries a title above the week, the day view has no title at all. A fraction of the height would
  * put the line in three different places; the letters are the one landmark all three have.
  */
-@Composable fun Modifier.glassBand(backdrop: GraphicsLayer, backdropOrigin: Offset, solidRoot: Float): Modifier {
+@Composable fun Modifier.glassBand(backdrop: GraphicsLayer, backdropOrigin: State<Offset>, solidRoot: Float): Modifier {
     val lens = rememberGraphicsLayer()
     val density = LocalDensity.current.density
     val padding = FrostPaddingDp * density
@@ -135,7 +141,10 @@ private object BodySlot
     SideEffect { lens.renderEffect = effect }
     return onSizeChanged { bounds = it }.onGloballyPositioned { origin = it.positionInRoot() }.drawWithContent {
         if (effect != null) {
-            val offset = origin - backdropOrigin
+            // Read at draw time, not at composition: the layer's origin arrives from a layout callback,
+            // so a value captured while composing is one frame old at best and its initial zero — the
+            // window's top — at worst.
+            val offset = origin - backdropOrigin.value
             lens.record(size = IntSize((size.width + 2 * padding).roundToInt(), (size.height + 2 * padding).roundToInt())) {
                 translate(padding - offset.x, padding - offset.y) { drawLayer(backdrop) }
             }
