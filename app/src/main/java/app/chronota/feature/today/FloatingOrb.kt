@@ -103,8 +103,8 @@ fun FloatingOrb(timer: TimerSession?, defaultAction: OrbAction, onAction: (OrbAc
             .drawWithContent {
                 drawContent()
                 drawRect(stain.copy(alpha = .12f))
-                drawRect(diagonalLight(size, listOf(Color.White.copy(alpha = .12f), Color.Transparent)))
-                drawRect(diagonalLight(size, listOf(Color.Transparent, Color.Black.copy(alpha = .03f))))
+                drawRect(diagonalLight(size, listOf(Color.White.copy(alpha = .10f), Color.Transparent)))
+                drawRect(diagonalLight(size, listOf(Color.Transparent, Color.Black.copy(alpha = .025f))))
             }
             .glassRing()
             .semantics { contentDescription = description; role = Role.Button; onClick { tap(); true }; onLongClick { expanded = true; true } }

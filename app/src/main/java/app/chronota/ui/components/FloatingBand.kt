@@ -131,7 +131,7 @@ fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() 
             // band's glass has a tone of its own instead of being only the page's grey fading out.
             drawRect(body.copy(alpha = .12f))
             // And one light on it, from the corner, along the same 45° axis as every other piece.
-            drawRect(diagonalLight(size, listOf(Color.White.copy(alpha = .06f), Color.Transparent)))
+            drawRect(diagonalLight(size, listOf(Color.White.copy(alpha = .05f), Color.Transparent)))
         }
         drawContent()
     }
