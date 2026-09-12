@@ -238,7 +238,6 @@ fun ChronotaApp(themeMode: ThemeMode, onTheme: (ThemeMode) -> Unit, snackbar: Sn
                         exactSettings = if (Build.VERSION.SDK_INT >= 31) ({ application.startActivity(Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, ("package:" + application.packageName).toUri()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }) else null)
                 }
             }
-            if (wheelOpen) Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.scrim.copy(alpha = .26f)).pointerInput(Unit) { awaitPointerEventScope { while (true) awaitPointerEvent().changes.forEach { it.consume() } } })
             if (Destination.entries.any { it.route == route }) Box(Modifier.align(Alignment.BottomCenter)) {
                 GlassDock(route, { destination -> nav.navigate(destination) {
                     popUpTo(nav.graph.findStartDestination().id) { saveState = true }

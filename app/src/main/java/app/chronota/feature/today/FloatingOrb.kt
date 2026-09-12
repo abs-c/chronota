@@ -85,11 +85,11 @@ fun FloatingOrb(timer: TimerSession?, defaultAction: OrbAction, onAction: (OrbAc
                         // same rim. Which action is under the finger is said by the icon and the label,
                         // the way the dock says which page you are on — not by a disc of colour laid over
                         // the glass, which is louder than anything else on the page.
-                        .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.surfaceContainerHigh, tintAlpha = .22f)
+                        .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.surfaceContainerHigh, tintAlpha = .45f)
                         .drawWithContent {
                             drawContent()
                             drawRect(diagonalLight(size, listOf(Color.White.copy(alpha = lighting.wash), Color.Transparent)))
-                            drawRect(diagonalLight(size, listOf(Color.Transparent, Color.Black.copy(alpha = .09f * lighting.shade))))
+                            drawRect(diagonalLight(size, listOf(Color.Transparent, Color.Black.copy(alpha = .04f * lighting.shade))))
                         }
                         .glassRing()
                         .testTag("wheel_${action.name}")
@@ -117,7 +117,7 @@ fun FloatingOrb(timer: TimerSession?, defaultAction: OrbAction, onAction: (OrbAc
                 drawContent()
                 drawRect(stain.copy(alpha = .12f))
                 drawRect(diagonalLight(size, listOf(Color.White.copy(alpha = lighting.wash), Color.Transparent)))
-                drawRect(diagonalLight(size, listOf(Color.Transparent, Color.Black.copy(alpha = .09f * lighting.shade))))
+                drawRect(diagonalLight(size, listOf(Color.Transparent, Color.Black.copy(alpha = .04f * lighting.shade))))
             }
             .glassRing()
             .semantics { contentDescription = description; role = Role.Button; onClick { tap(); true }; onLongClick { expanded = true; true } }
