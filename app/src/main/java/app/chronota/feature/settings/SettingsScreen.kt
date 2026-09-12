@@ -77,12 +77,13 @@ fun SettingsScreen(themeMode: ThemeMode, onTheme: (ThemeMode) -> Unit, onBack: (
                 runCatching {
                     val info = context.packageManager.getPackageInfo(context.packageName, 0)
                     val installed = java.time.Instant.ofEpochMilli(info.lastUpdateTime).atZone(java.time.ZoneId.systemDefault())
-                    "${info.versionName} (${info.longVersionCode}) · " +
+                    val code = if (android.os.Build.VERSION.SDK_INT >= 28) info.longVersionCode else @Suppress("DEPRECATION") info.versionCode.toLong()
+                    "${info.versionName} ($code) · " +
                         installed.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
                 }.getOrDefault("")
             }
             SettingsSection(R.string.version_info) {
-            OptionRow("Chronota", null, {}, arrow = false, value = build)
+            OptionRow(stringResource(R.string.app_name), null, {}, arrow = false, value = build)
             }
         }
     }
