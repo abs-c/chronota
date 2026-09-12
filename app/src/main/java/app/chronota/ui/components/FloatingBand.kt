@@ -34,11 +34,11 @@ private const val BandGlassEnabled = true
  */
 private const val SolidFraction = .3f
 
-/** The grey's alpha in the glass: high, because the band is still grey — it is stained, not removed. */
-private const val BandTint = 1f
+/** Where the glass has reached its full strength (310px of 374px on the emulator). */
+private const val ClearFraction = .8f
 
-/** A few dp of taper at that line, so the change of material is not a seam drawn across the band. */
-private const val TaperDp = 4f
+/** The grey's alpha once it is fully glass: a tenth, so the schedule reads straight through. */
+private const val BandTint = .1f
 
 /**
  * A page with a band across its top and the page's own body under it.
@@ -114,20 +114,16 @@ fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() 
             // The band is the page's grey and nothing else.
             drawRect(base)
         } else {
-            // The band is the same grey it was, all the way down: opaque above the title's baseline,
-            // and from there a stain of exactly that grey over the glass. The eye cannot tell the two
-            // apart — 242 where it is opaque, 244 where it is stained — so the band has not changed
-            // its colour or its look; what has changed is that from the baseline down it is glass, and
-            // the schedule passing behind it is seen there and bent by the lens.
+            // The grey the band has always been: solid down to the title's baseline, then thinning —
+            // 1.0 down to a tenth — until it is fully glass, and glass the rest of the way to the
+            // lower edge. So the band comes out of its opaque header, becomes a window on the
+            // schedule, and ends as clear pane over the sheet.
             val end = size.height.coerceAtLeast(1f)
-            val glassFrom = size.height * SolidFraction
-            val taper = TaperDp * density
-            val stained = (glassFrom + taper) / end
             drawRect(
                 Brush.verticalGradient(
                     0f to base,
-                    (glassFrom / end).coerceIn(0f, 1f) to base,
-                    stained.coerceIn(0f, 1f) to base.copy(alpha = BandTint),
+                    SolidFraction to base,
+                    ClearFraction to base.copy(alpha = BandTint),
                     1f to base.copy(alpha = BandTint),
                     startY = 0f,
                     endY = end,
