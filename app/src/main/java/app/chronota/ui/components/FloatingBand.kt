@@ -36,7 +36,7 @@ private const val SolidFraction = .3f
 
 
 /** The grey's alpha once it is fully glass: a tenth, so the schedule reads straight through. */
-private const val BandTint = .1f
+private const val BandTint = .3f
 
 /**
  * A page with a band across its top and the page's own body under it.
