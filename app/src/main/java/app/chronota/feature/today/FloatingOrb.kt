@@ -88,8 +88,8 @@ fun FloatingOrb(timer: TimerSession?, defaultAction: OrbAction, onAction: (OrbAc
                         .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.surfaceContainerHigh, tintAlpha = .22f)
                         .drawWithContent {
                             drawContent()
-                            drawRect(diagonalLight(size, listOf(Color.White.copy(alpha = .10f * lighting.light), Color.Transparent)))
-                            drawRect(diagonalLight(size, listOf(Color.Transparent, Color.Black.copy(alpha = .025f * lighting.shade))))
+                            drawRect(diagonalLight(size, listOf(Color.White.copy(alpha = lighting.wash), Color.Transparent)))
+                            drawRect(diagonalLight(size, listOf(Color.Transparent, Color.Black.copy(alpha = .09f * lighting.shade))))
                         }
                         .glassRing()
                         .testTag("wheel_${action.name}")
@@ -116,8 +116,8 @@ fun FloatingOrb(timer: TimerSession?, defaultAction: OrbAction, onAction: (OrbAc
             .drawWithContent {
                 drawContent()
                 drawRect(stain.copy(alpha = .12f))
-                drawRect(diagonalLight(size, listOf(Color.White.copy(alpha = .10f * lighting.light), Color.Transparent)))
-                drawRect(diagonalLight(size, listOf(Color.Transparent, Color.Black.copy(alpha = .025f * lighting.shade))))
+                drawRect(diagonalLight(size, listOf(Color.White.copy(alpha = lighting.wash), Color.Transparent)))
+                drawRect(diagonalLight(size, listOf(Color.Transparent, Color.Black.copy(alpha = .09f * lighting.shade))))
             }
             .glassRing()
             .semantics { contentDescription = description; role = Role.Button; onClick { tap(); true }; onLongClick { expanded = true; true } }

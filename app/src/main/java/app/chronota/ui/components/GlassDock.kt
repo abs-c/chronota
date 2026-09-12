@@ -93,9 +93,8 @@ fun GlassDock(route: String, navigate: (String) -> Unit, timer: TimerSession?, d
                 // with this one.
                 val centre = lightCentre ?: return@drawWithContent
                 val item = itemPx
-                val lit = lighting.light
                 drawRect(Brush.radialGradient(
-                    listOf(Color.White.copy(alpha = .14f * lit), Color.White.copy(alpha = .04f * lit), Color.Transparent),
+                    listOf(Color.White.copy(alpha = lighting.wash), Color.White.copy(alpha = lighting.wash * .3f), Color.Transparent),
                     center = centre,
                     radius = item * 1.6f,
                 ))
@@ -103,7 +102,7 @@ fun GlassDock(route: String, navigate: (String) -> Unit, timer: TimerSession?, d
                 // are its darkest part. A pool of light with no shade under it reads as a sticker; the
                 // shade is what makes it sit on something with a thickness.
                 drawRect(Brush.radialGradient(
-                    listOf(Color.Transparent, Color.Transparent, Color.Black.copy(alpha = .04f * lighting.shade)),
+                    listOf(Color.Transparent, Color.Transparent, Color.Black.copy(alpha = .09f * lighting.shade)),
                     center = centre,
                     radius = item * 2.6f,
                 ))

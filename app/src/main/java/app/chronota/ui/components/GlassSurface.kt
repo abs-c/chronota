@@ -87,11 +87,19 @@ internal fun diagonalLight(size: Size, colors: List<Color>): Brush {
  * every shadow at full strength; a dark pane does the opposite. So the recipe stays one recipe, and
  * each mode scales it: the light up and the shade down in the light, the other way about in the dark.
  */
-internal data class GlassLighting(val light: Float, val shade: Float)
 
-/** The palette in force, not the system's: the app can pin its own theme. */
+internal data class GlassLighting(val light: Float, val shade: Float, val wash: Float)
+
+/**
+ * The palette in force, not the system's: the app can pin its own theme.
+ *
+ * `light` and `shade` scale the rim's two sides and the gradients inside the pane. `wash` is the
+ * broad surface light in absolute terms, because white on white and white on black are not the same
+ * job: a highlight over a near-white pane can only ever add the few levels between the pane and
+ * white, so in the light it is four tenths where in the dark half of that already glares.
+ */
 @Composable
 internal fun glassLighting(): GlassLighting = if (MaterialTheme.colorScheme.background.luminance() < .5f)
-    GlassLighting(light = .8f, shade = 1.3f)
+    GlassLighting(light = .8f, shade = 1.3f, wash = .10f)
 else
-    GlassLighting(light = 1.35f, shade = .85f)
+    GlassLighting(light = 1.35f, shade = .85f, wash = .40f)

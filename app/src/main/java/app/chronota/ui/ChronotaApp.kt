@@ -173,7 +173,7 @@ fun ChronotaApp(themeMode: ThemeMode, onTheme: (ThemeMode) -> Unit, snackbar: Sn
     ) { insets ->
         Box(Modifier.padding(insets).fillMaxSize()) {
             if (state.failed) Text(stringResource(R.string.error_load), Modifier.padding(Space.md), color = MaterialTheme.colorScheme.error)
-            NavHost(nav, startDestination = Destination.TODAY.route, enterTransition = { fadeIn(tween(90)) }, exitTransition = { fadeOut(tween(70)) }, modifier = Modifier.fillMaxSize().graphicsLayer { renderEffect = if (wheelOpen) BlurEffect(18f, 18f, TileMode.Clamp) else null }.onGloballyPositioned { backdropOrigin = it.positionInRoot() }.drawWithContent { backdrop.record { drawRect(backdropColor); this@drawWithContent.drawContent() }; drawLayer(backdrop) }) {
+            NavHost(nav, startDestination = Destination.TODAY.route, enterTransition = { fadeIn(tween(90)) }, exitTransition = { fadeOut(tween(70)) }, modifier = Modifier.fillMaxSize().onGloballyPositioned { backdropOrigin = it.positionInRoot() }.drawWithContent { backdrop.record { drawRect(backdropColor); this@drawWithContent.drawContent() }; drawLayer(backdrop) }) {
                 composable("today") { TodayScreen(onSettings = { nav.navigate("settings") }, state = state, snapMinutes = 15,
                     onPlan = { id, time -> planSeed = null; planOccurrence = null; planEnd = null; planStart = time?.toEpochMilli(); planId = id },
                     onPlanDate = { id, occurrence -> planSeed = null; planOccurrence = occurrence; planStart = null; planEnd = null; planId = id },
@@ -238,7 +238,7 @@ fun ChronotaApp(themeMode: ThemeMode, onTheme: (ThemeMode) -> Unit, snackbar: Sn
                         exactSettings = if (Build.VERSION.SDK_INT >= 31) ({ application.startActivity(Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, ("package:" + application.packageName).toUri()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }) else null)
                 }
             }
-            if (wheelOpen) Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.scrim.copy(alpha = .32f)).pointerInput(Unit) { awaitPointerEventScope { while (true) awaitPointerEvent().changes.forEach { it.consume() } } })
+            if (wheelOpen) Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.scrim.copy(alpha = .26f)).pointerInput(Unit) { awaitPointerEventScope { while (true) awaitPointerEvent().changes.forEach { it.consume() } } })
             if (Destination.entries.any { it.route == route }) Box(Modifier.align(Alignment.BottomCenter)) {
                 GlassDock(route, { destination -> nav.navigate(destination) {
                     popUpTo(nav.graph.findStartDestination().id) { saveState = true }
