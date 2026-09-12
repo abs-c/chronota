@@ -61,14 +61,25 @@ fun GlassDock(route: String, navigate: (String) -> Unit, timer: TimerSession?, d
         Box(Modifier.weight(1f).requiredHeight(Metrics.dockHeight).testTag("glass_dock")
             .graphicsLayer { alpha = if (wheelOpen) 0f else 1f }
             .clip(CircleShape)
-            // Nearly opaque, like the chrome of a system bar: what is behind a dock is text and grid
-            // lines, and at a low alpha they frost into patches of grey that read as a split pane.
-            .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.surface, tintAlpha = .05f)
+            // One step off the paper, whichever paper it is: `surfaceContainerHigh` is a shade darker
+            // than the sheet in the light and a shade lighter than it in the dark, so the pane has a
+            // body of its own and the rim's light has something to land on. A white wash on white, and
+            // a black wash on black, are both nothing at all.
+            .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.surfaceContainerHigh, tintAlpha = .18f)
             .drawWithContent {
                 drawContent()
-                // The light falling on the top of the glass, and the shade gathering at its bottom.
-                drawRect(Brush.verticalGradient(listOf(Color.White.copy(alpha = .18f), Color.Transparent), endY = size.height * .58f))
-                drawRect(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = .025f)), startY = size.height * .75f))
+                // Light from the upper left and shade to the lower right, the same direction as the
+                // rim: one light for the whole material.
+                drawRect(Brush.linearGradient(
+                    listOf(Color.White.copy(alpha = .12f), Color.Transparent),
+                    start = Offset.Zero,
+                    end = Offset(size.width * .8f, size.height),
+                ))
+                drawRect(Brush.linearGradient(
+                    listOf(Color.Transparent, Color.Black.copy(alpha = .03f)),
+                    start = Offset(size.width * .2f, 0f),
+                    end = Offset(size.width, size.height),
+                ))
             }
             .glassRing()) {
             Row(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface.copy(alpha = .08f)).padding(Space.xxs).selectableGroup()) {

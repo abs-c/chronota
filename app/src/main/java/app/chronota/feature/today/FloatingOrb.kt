@@ -94,15 +94,24 @@ fun FloatingOrb(timer: TimerSession?, defaultAction: OrbAction, onAction: (OrbAc
         // No panel behind the elapsed time: it reads straight on the page.
         if (timer != null && !expanded) Text(timerElapsedText(timer.elapsed(now)),
             Modifier.align(Alignment.TopEnd).offset(y = -Metrics.orb / 2), style = MaterialTheme.typography.labelMedium)
-        // The dock's own material, nothing added: the same glass, the same wash of the surface colour,
-        // the same light falling on it and the same rim. No colour of its own — what tells it apart is
-        // its shape and the icon on it.
+        // The dock's material, plus one thin stain of the theme colour. Same body, same light, same
+        // direction as every other piece of glass on the page.
+        val stain = MaterialTheme.colorScheme.primary
         Box(Modifier.size(Metrics.orb).graphicsLayer { scaleX = pressScale; scaleY = pressScale }.clip(CircleShape)
-            .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.primary, tintAlpha = .1f)
+            .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.surfaceContainerHigh, tintAlpha = .18f)
             .drawWithContent {
                 drawContent()
-                drawRect(Brush.verticalGradient(listOf(Color.White.copy(alpha = .18f), Color.Transparent), endY = size.height * .58f))
-                drawRect(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = .025f)), startY = size.height * .75f))
+                drawRect(stain.copy(alpha = .12f))
+                drawRect(Brush.linearGradient(
+                    listOf(Color.White.copy(alpha = .12f), Color.Transparent),
+                    start = Offset.Zero,
+                    end = Offset(size.width * .8f, size.height),
+                ))
+                drawRect(Brush.linearGradient(
+                    listOf(Color.Transparent, Color.Black.copy(alpha = .03f)),
+                    start = Offset(size.width * .2f, 0f),
+                    end = Offset(size.width, size.height),
+                ))
             }
             .glassRing()
             .semantics { contentDescription = description; role = Role.Button; onClick { tap(); true }; onLongClick { expanded = true; true } }

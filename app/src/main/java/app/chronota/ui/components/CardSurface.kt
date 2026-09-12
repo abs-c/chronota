@@ -65,12 +65,12 @@ private val SheetShadow = Color.Black.copy(alpha = .07f)
         }
         val line = stroke.toPx()
         val lit = Brush.linearGradient(
-            listOf(Color.White.copy(alpha = .9f), Color.White.copy(alpha = .3f), Color.White.copy(alpha = .06f)),
+            listOf(Color.White.copy(alpha = .6f), Color.White.copy(alpha = .22f), Color.White.copy(alpha = .05f)),
             start = Offset(0f, 0f),
             end = Offset(size.width * .82f, size.height),
         )
-        drawPath(edge, brush = lit, alpha = .14f, style = Stroke(line * 5f))
+        drawPath(edge, brush = lit, alpha = .10f, style = Stroke(line * 3f))
         drawPath(edge, brush = lit, style = Stroke(line))
-        drawPath(edge, brush = Brush.linearGradient(listOf(Color.Transparent, Color.Transparent, separator.copy(alpha = .3f))), style = Stroke(line))
+        drawPath(edge, brush = Brush.linearGradient(listOf(Color.Transparent, Color.Transparent, separator.copy(alpha = .34f))), style = Stroke(line))
     }
 }
