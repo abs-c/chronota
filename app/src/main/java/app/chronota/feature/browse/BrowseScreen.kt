@@ -304,9 +304,13 @@ fun ModeTabs(labels: List<Int>, selected: Int, select: (Int) -> Unit, tag: Strin
         }
     }
     when (scale) {
-        0 -> Box(Modifier.fillMaxSize().cardSurface(SheetShape).testTag("calendar_day")) {
-            TodayScreen({}, dayState, onPlan = { id, _ -> if (id != 0L) onPlan(id) else add(date) }, onRecord = { id, _ -> if (id != 0L) onRecord(id) else add(date) },
-                onCreatePlan = createPlan, onCreateRecord = createRecord, calendarCutoff = now, selectedDate = date, showHeader = false, showPlans = showPlans, showRecords = true, singleColumn = true)
+        0 -> Column(Modifier.fillMaxSize().testTag("calendar_day")) {
+            // The day keeps Today's week strip, so the two views read as the same one.
+            WeekStrip(date, LocalDisplayPreferences.current.weekStart, { date = it }, { date = date.minusDays(1) }, { date = date.plusDays(1) })
+            Box(Modifier.weight(1f).padding(top = Space.sm).sheetSurface()) {
+                TodayScreen({}, dayState, onPlan = { id, _ -> if (id != 0L) onPlan(id) else add(date) }, onRecord = { id, _ -> if (id != 0L) onRecord(id) else add(date) },
+                    onCreatePlan = createPlan, onCreateRecord = createRecord, calendarCutoff = now, selectedDate = date, showHeader = false, showPlans = showPlans, showRecords = true, singleColumn = true)
+            }
         }
         1 -> Column(Modifier.fillMaxSize().testTag("calendar_week")) {
             // The weekday names are a fixed header. Below them a swipe anywhere turns the week, and
@@ -318,7 +322,7 @@ fun ModeTabs(labels: List<Int>, selected: Int, select: (Int) -> Unit, tag: Strin
                 // them with the all-day row, so the color changes below the dates rather than above.
                 WeekGridHeader(date)
                 WeekDateRow(date, weekSwipe) { date = it; scale = 0 }
-                Column(Modifier.weight(1f).cardSurface(SheetShape)) {
+                Column(Modifier.weight(1f).padding(top = Space.sm).sheetSurface()) {
                     WeekAllDayRow(date, entries, state, weekSwipe) { if (it.isPlan) onPlan(it.id) else onRecord(it.id) }
                     Column(Modifier.weight(1f).topFade().verticalScroll(rememberScrollState()).padding(top = Space.sm).padding(bottom = Metrics.dockClearance)) {
                         WeekGridBody(date, entries, state, weekSwipe) { if (it.isPlan) onPlan(it.id) else onRecord(it.id) }

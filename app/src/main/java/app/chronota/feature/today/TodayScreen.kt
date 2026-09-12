@@ -87,9 +87,9 @@ fun TodayScreen(onSettings: () -> Unit, state: WorkspaceState = WorkspaceState()
     // background itself instead of sitting on the grouped gray. Only the header band is separated,
     // by a hairline rather than by a change of color.
     PageColumn(Modifier.background(MaterialTheme.colorScheme.surface)) {
-        // The date band keeps the grouped background while the schedule below it is plain paper, so the
-        // page changes color under the dates instead of cutting through them.
-        if (showHeader) Column(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.background)) {
+        // The date band keeps the grouped background and casts the seam the paper slides under; the
+        // schedule below it is the plain page.
+        if (showHeader) Column(Modifier.fillMaxWidth().bandSurface().padding(bottom = Space.sm)) {
         val locale = androidx.compose.ui.platform.LocalResources.current.configuration.locales[0]
         val monthPattern = if (locale.language == "zh") "yyyy 年 M 月" else "MMMM yyyy"
         Row(Modifier.fillMaxWidth().padding(start = Space.md, top = Space.xxs, end = Space.md), verticalAlignment = Alignment.CenterVertically) {
@@ -102,31 +102,8 @@ fun TodayScreen(onSettings: () -> Unit, state: WorkspaceState = WorkspaceState()
             Spacer(Modifier.weight(1f))
             if (weekView || date != logicalDate(now, zone, dayStart)) TextButton(onClick = { date = logicalDate(Instant.now(), dayStartMinutes = dayStart) }, modifier = Modifier.testTag("jump_today")) { Text(stringResource(R.string.today)) }
         }
-        if (weekView) {
-            val monday = weekStartOf(date, preferences.weekStart)
-            // The weekday names are always the same seven, so that row stays put; only the dates
-            // slide, which is what a swipe actually changes.
-            val weekSwipe = rememberSwipeController()
-            Column(Modifier.fillMaxWidth().padding(horizontal = Space.md).swipeGestures(weekSwipe, { date = date.minusWeeks(1) }, { date = date.plusWeeks(1) })) {
-                Row(Modifier.fillMaxWidth()) {
-                    repeat(7) { index ->
-                        Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                            Text(monday.plusDays(index.toLong()).dayOfWeek.getDisplayName(TextStyle.NARROW, locale), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        }
-                    }
-                }
-                Row(Modifier.fillMaxWidth().swipeTranslation(weekSwipe)) {
-                    repeat(7) { index ->
-                        val item = monday.plusDays(index.toLong())
-                        Box(Modifier.weight(1f).testTag("week_day_$index").clickable { date = item }.padding(vertical = Space.xxs), contentAlignment = Alignment.Center) {
-                            Box(Modifier.size(Metrics.calendarDay).clip(androidx.compose.foundation.shape.CircleShape).background(if (date == item) MaterialTheme.colorScheme.primary else if (item == logicalDate(now, zone, dayStart)) MaterialTheme.colorScheme.secondaryContainer else Color.Transparent), contentAlignment = Alignment.Center) {
-                                Text(item.dayOfMonth.toString(), color = if (date == item) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface)
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        // The same strip the calendar's day view draws, so both turn the week the same way.
+        if (weekView) WeekStrip(date, preferences.weekStart, { date = it }, { date = date.minusWeeks(1) }, { date = date.plusWeeks(1) })
         }
         if (!singleColumn) Row(Modifier.fillMaxWidth().padding(vertical = Space.xxs)) {
             if (showPlans) Box(Modifier.weight(1f).padding(start = Metrics.timelineGutter)) { Text(stringResource(R.string.plan), style = MaterialTheme.typography.labelMedium) }

@@ -34,7 +34,7 @@ fun SettingsScreen(themeMode: ThemeMode, onTheme: (ThemeMode) -> Unit, onBack: (
     onTimerSettings: (app.chronota.data.entity.TimerMode, Int, Int, Int, () -> Unit) -> Unit = { _, _, _, _, _ -> }) {
     var panel by rememberSaveable { mutableStateOf<String?>(null) }
     PageColumn {
-        Column(Modifier.testTag("settings_list").verticalScroll(rememberScrollState()).padding(Space.md).padding(bottom = Metrics.dockClearance), verticalArrangement = Arrangement.spacedBy(Space.sm)) {
+        Column(Modifier.testTag("settings_list").verticalScroll(rememberScrollState()).padding(Space.md).padding(bottom = Metrics.dockClearance), verticalArrangement = Arrangement.spacedBy(Space.xs)) {
             // Ordered from what the app stores outwards to how it looks: content, then the time model
             // it is filed under, then what each view shows, then appearance, touch and notifications.
             SettingsSection(R.string.settings_data) {
@@ -95,8 +95,7 @@ private fun languageLabel(tag: String): Int = when (tag) { "zh-CN" -> R.string.l
 
 /** One captioned block of settings: a small heading over a flat group of rows. */
 @Composable private fun SettingsSection(@StringRes title: Int, content: @Composable ColumnScope.() -> Unit) {
-    Spacer(Modifier.height(Space.xxs))
-    Text(stringResource(title), Modifier.padding(start = Space.md, top = Space.xs, bottom = Space.xxs),
+    Text(stringResource(title), Modifier.padding(start = Space.md, top = Space.xxs, bottom = Space.xxs),
         style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
     OptionGroup(content = content)
 }
