@@ -61,14 +61,17 @@ fun GlassDock(route: String, navigate: (String) -> Unit, timer: TimerSession?, d
         Box(Modifier.weight(1f).requiredHeight(Metrics.dockHeight).testTag("glass_dock")
             .graphicsLayer { alpha = if (wheelOpen) 0f else 1f }
             .shadow(Metrics.floatingElevation, CircleShape, ambientColor = Color.Black.copy(alpha = .08f), spotColor = Color.Black.copy(alpha = .12f)).clip(CircleShape)
-            .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.surface, tintAlpha = .16f)
+            // Nearly opaque, like the chrome of a system bar: what is behind a dock is text and grid
+            // lines, and at a low alpha they frost into patches of grey that read as a split pane.
+            .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.surface, tintAlpha = .72f)
             .glassRing()) {
             Row(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface.copy(alpha = .08f)).padding(Space.xxs).selectableGroup()) {
                 routes.forEachIndexed { index, destination ->
                     val selected = route == destination
                     val tint = if (selected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
+                    // The selected page is told by its icon and label, not by a fill behind them: a
+                    // second tone inside the bar is what made its glass look split in two.
                     Column(Modifier.weight(1f).fillMaxHeight().clip(CircleShape)
-                        .background(if (selected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = .3f) else Color.Transparent)
                         .testTag("nav_$destination").selectable(selected, enabled = !wheelOpen, role = Role.Tab, onClick = { navigate(destination) }),
                         horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                         Icon(icons[index], null, Modifier.size(Metrics.icon), tint = tint)
