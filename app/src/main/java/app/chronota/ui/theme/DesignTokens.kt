@@ -90,7 +90,7 @@ object Metrics {
      * lower edge, and the glass is behind all of it. The schedule reaches up this far too, so what it
      * scrolls into the band is seen where the grey has already given way.
      */
-    val bandGlass = 44.dp
+    val bandGlass = 14.dp
 
 
 

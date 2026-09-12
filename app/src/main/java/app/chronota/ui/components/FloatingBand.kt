@@ -25,6 +25,14 @@ import kotlin.math.roundToInt
 import app.chronota.ui.theme.Metrics
 
 /**
+ * Where the band stops being solid grey and becomes glass: over its top third, which is the row the
+ * title sits on. Everything below that is glass — that is the region the schedule is seen through —
+ * and the grey is spent by the band's lower edge, where nothing of it is left over the sheet.
+ */
+private const val SolidFraction = .3f
+
+
+/**
  * A page with a band across its top and the page's own body under it.
  *
  * The band is glass over the schedule. It closes into the page's grey across its own content, so the
@@ -98,10 +106,10 @@ fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() 
             }
             translate(-padding, -padding) { drawLayer(lens) }
         }
-        // Grey across the band's content, then spent over the last [Metrics.bandGlass] of its height —
-        // from above the date's baseline down to the lower edge — so that stretch of the band is glass
-        // resting on the sheet, and the schedule passing under it is seen there.
-        val solidTop = (size.height - Metrics.bandGlass.toPx()).coerceAtLeast(0f)
+        // Grey over the top third — the row the title sits on — and then spent: everything under that
+        // is glass, which is the region the schedule behind it is seen through, and the grey is gone
+        // entirely by the lower edge, where nothing of it is left over the sheet.
+        val solidTop = size.height * SolidFraction
         val end = size.height.coerceAtLeast(1f)
         drawRect(
             Brush.verticalGradient(
@@ -112,9 +120,18 @@ fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() 
                 endY = end,
             )
         )
-        // The band's own edge, where the glass meets the sheet: the pane's lit inner side, then the
-        // step of its thickness, both soft at the ends so the edge is an edge and not a rule.
+        // The edge where the glass meets the sheet: the pane's lit inner side along the very lip,
+        // above it the shade the glass gathers, both soft at the ends so the edge is an edge and not
+        // a rule drawn across the page.
         val hairline = Metrics.hairline.toPx()
+        val lip = 9.dp.toPx()
+        drawRect(
+            Brush.verticalGradient(
+                listOf(Color.Transparent, Color.Black.copy(alpha = .05f)),
+                startY = (size.height - lip).coerceAtLeast(0f),
+                endY = size.height,
+            )
+        )
         val edgeY = size.height - hairline
         drawLine(
             brush = Brush.horizontalGradient(listOf(Color.Transparent, Color.White.copy(alpha = .75f), Color.White.copy(alpha = .9f), Color.White.copy(alpha = .75f), Color.Transparent)),
