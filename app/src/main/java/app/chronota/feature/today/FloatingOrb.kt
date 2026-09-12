@@ -98,7 +98,7 @@ fun FloatingOrb(timer: TimerSession?, defaultAction: OrbAction, onAction: (OrbAc
         // the same light falling on it and the same rim. No colour of its own — what tells it apart is
         // its shape and the icon on it.
         Box(Modifier.size(Metrics.orb).graphicsLayer { scaleX = pressScale; scaleY = pressScale }.clip(CircleShape)
-            .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.surface, tintAlpha = .05f)
+            .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.primary, tintAlpha = .2f)
             .drawWithContent {
                 drawContent()
                 drawRect(Brush.verticalGradient(listOf(Color.White.copy(alpha = .18f), Color.Transparent), endY = size.height * .58f))
