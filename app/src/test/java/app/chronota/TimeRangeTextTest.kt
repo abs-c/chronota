@@ -20,8 +20,8 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 /**
- * How a range is written down: bare clock times while it stays inside one calendar date, dates on
- * both ends once it crosses one, and the year only when it crosses a year as well.
+ * How a range is written down: bare clock times while it stays inside one calendar date, and another
+ * end of clock times with the marker "+1", "+2" for each calendar day a range crosses.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [35], qualifiers = "en-rUS-w400dp-h850dp")
@@ -108,12 +108,22 @@ class TimeRangeTextTest {
         assertEquals("21:30", ends?.second?.text)
     }
 
-    @Test fun agendaEndsThatCrossADayCarryDatesInsteadOfAMarker() {
+    @Test fun agendaEndsThatCrossADayCarryTheDayOffsetNotTheDate() {
         var ends: Pair<AnnotatedString, AnnotatedString>? = null
         compose.setContent {
             ends = axisRangeEndsText(TimeSpan(Instant.parse("2026-09-10T23:00:00Z"), Instant.parse("2026-09-11T01:00:00Z")), LocalDate.of(2026, 9, 10), ZoneOffset.UTC)
         }
-        assertEquals("Sep 10 23:00", ends?.first?.text)
-        assertEquals("Sep 11 01:00", ends?.second?.text)
+        assertEquals("23:00", ends?.first?.text)
+        assertEquals("01:00 +1", ends?.second?.text)
+    }
+
+    @Test fun agendaEndsCountEveryDayARangeCrosses() {
+        var ends: Pair<AnnotatedString, AnnotatedString>? = null
+        compose.setContent {
+            // 9/10 05:03 → 9/12 05:33: the shape a timer leaves behind over a weekend.
+            ends = axisRangeEndsText(TimeSpan(Instant.parse("2026-09-10T05:03:00Z"), Instant.parse("2026-09-12T05:33:00Z")), LocalDate.of(2026, 9, 10), ZoneOffset.UTC)
+        }
+        assertEquals("05:03", ends?.first?.text)
+        assertEquals("05:33 +2", ends?.second?.text)
     }
 }

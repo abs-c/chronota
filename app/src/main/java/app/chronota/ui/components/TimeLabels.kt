@@ -18,6 +18,7 @@ import app.chronota.ui.theme.Metrics
 import java.time.*
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
+import java.time.temporal.ChronoUnit
 
 fun timeText(value: Instant, zone: ZoneId = ZoneId.systemDefault()): String = value.atZone(zone).format(DateTimeFormatter.ofPattern("HH:mm"))
 @Composable fun dateText(date: LocalDate): String {
@@ -130,30 +131,36 @@ fun timeText(value: Instant, zone: ZoneId = ZoneId.systemDefault()): String = va
     return withNextDayMarker(hour.format(DateTimeFormatter.ofPattern("HH")), hour < dayStart)
 }
 
-/** The clock time, with the next-date marker set smaller and raised so it reads as a footnote. */
-@Composable fun withNextDayMarker(text: String, nextDate: Boolean): AnnotatedString {
-    val marker = stringResource(R.string.day_offset_suffix, 1)
+/** The clock time, with a day marker set smaller and raised so it reads as a footnote: "+1", "+2". */
+@Composable fun withDayOffsetMarker(text: String, offset: Int): AnnotatedString {
+    if (offset <= 0) return AnnotatedString(text)
+    val marker = stringResource(R.string.day_offset_suffix, offset)
     return buildAnnotatedString {
         append(text)
-        if (nextDate) {
-            append(" ")
-            withStyle(SpanStyle(fontSize = Metrics.compactLabelSize, baselineShift = BaselineShift.Superscript)) { append(marker) }
-        }
+        append(" ")
+        withStyle(SpanStyle(fontSize = Metrics.compactLabelSize, baselineShift = BaselineShift.Superscript)) { append(marker) }
     }
 }
 
+/** The case the axis labels mean: the time fell on the next calendar date. */
+@Composable fun withNextDayMarker(text: String, nextDate: Boolean): AnnotatedString = withDayOffsetMarker(text, if (nextDate) 1 else 0)
+
 /**
- * The two ends as an agenda row prints them. A range that crosses a calendar day spells out both
- * dates, which already says where the end lands; otherwise the ends are clock times, and one that
- * fell on the next calendar date of [logicalDate] carries the raised "+1" instead.
+ * The two ends as an agenda row prints them: clock times, each carrying how many calendar days past
+ * the row's own date it fell — "+1", "+2", as many as it takes.
+ *
+ * A range that crosses a day used to spell out both dates instead, on the argument that the dates say
+ * where the end lands. They do, but they cost the clock time the row exists to show, and the row is
+ * already filed under a date: "23:00 / 01:00 +1" says both things at once, and says it the same way
+ * the axis labels do.
  */
 @Composable fun axisRangeEndsText(span: TimeSpan, logicalDate: LocalDate?, zone: ZoneId = ZoneId.systemDefault()): Pair<AnnotatedString, AnnotatedString> {
     val start = span.start.atZone(zone)
     val end = span.end.atZone(zone)
-    val crosses = span.millis > 0 && start.toLocalDate() != end.toLocalDate()
-    val ends = rangeEndsText(span, zone)
-    @Composable fun mark(text: String, day: LocalDate) = withNextDayMarker(text, !crosses && logicalDate != null && day != logicalDate)
-    return mark(ends.first, start.toLocalDate()) to mark(ends.second, end.toLocalDate())
+    val base = logicalDate ?: start.toLocalDate()
+    val startGap = ChronoUnit.DAYS.between(base, start.toLocalDate()).toInt()
+    val endGap = ChronoUnit.DAYS.between(base, end.toLocalDate()).toInt()
+    return withDayOffsetMarker(timeText(span.start, zone), startGap) to withDayOffsetMarker(timeText(span.end, zone), endGap)
 }
 
 
