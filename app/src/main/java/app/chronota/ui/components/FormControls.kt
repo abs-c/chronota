@@ -98,7 +98,16 @@ import java.time.format.*
         .toggleable(checked, enabled = enabled, role = Role.Switch, onValueChange = change).padding(horizontal = Space.md), verticalAlignment = Alignment.CenterVertically) {
         if (icon != null) { Icon(icon, null, Modifier.size(Metrics.icon)); Spacer(Modifier.width(Space.xs)) }
         Text(stringResource(label), Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
-        Switch(checked, null, enabled = enabled, modifier = Modifier.size(width = Metrics.switchWidth, height = Metrics.controlHeight).graphicsLayer { scaleX = Metrics.switchScale; scaleY = Metrics.switchScale })
+        Switch(checked, null, enabled = enabled, colors = SwitchDefaults.colors(
+            // Set here rather than left to the palette's defaults. Material takes the off thumb from
+            // `outline` and the off track from `surfaceContainerHighest`; in this dark palette those
+            // are #38383A and #3A3A3C, two levels apart, so an off switch came out as a dark pill with
+            // no knob in it. The off track is systemGray5 and the off knob is the raised surface: white
+            // on light grey in the light, grey on near black in the dark.
+            uncheckedThumbColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+            uncheckedTrackColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            uncheckedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+        ), modifier = Modifier.size(width = Metrics.switchWidth, height = Metrics.controlHeight).graphicsLayer { scaleX = Metrics.switchScale; scaleY = Metrics.switchScale })
     }
 }
 
