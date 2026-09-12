@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.IntSize
 import kotlin.math.roundToInt
 
 /** How far the frost spreads: enough to lose a grid line, small enough to keep the page's colour. */
-internal const val FrostRadiusDp = 5f
+internal const val FrostRadiusDp = 4f
 
 /** Room around a glass surface for the frost to reach into, so its edges are not clamped. */
 internal const val FrostPaddingDp = 24f
@@ -109,4 +109,4 @@ else
  * orb, the balls that come out of it — so that none of them is a different thickness from the rest;
  * the band is the exception, because its body is the page's own grey thinning out.
  */
-internal const val GlassBodyAlpha = .22f
+internal const val GlassBodyAlpha = .30f
