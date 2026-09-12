@@ -35,6 +35,7 @@ import app.chronota.data.entity.TimerSession
 import app.chronota.domain.*
 import app.chronota.ui.components.glassRing
 import app.chronota.ui.components.diagonalLight
+import app.chronota.ui.components.glassLighting
 import app.chronota.ui.components.glassSurface
 import app.chronota.ui.components.AppIcons
 import app.chronota.ui.theme.Metrics
@@ -98,13 +99,14 @@ fun FloatingOrb(timer: TimerSession?, defaultAction: OrbAction, onAction: (OrbAc
         // The dock's material, plus one thin stain of the theme colour. Same body, same light, same
         // direction as every other piece of glass on the page.
         val stain = MaterialTheme.colorScheme.primary
+        val lighting = glassLighting()
         Box(Modifier.size(Metrics.orb).graphicsLayer { scaleX = pressScale; scaleY = pressScale }.clip(CircleShape)
             .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.surfaceContainerHigh, tintAlpha = .18f)
             .drawWithContent {
                 drawContent()
                 drawRect(stain.copy(alpha = .12f))
-                drawRect(diagonalLight(size, listOf(Color.White.copy(alpha = .10f), Color.Transparent)))
-                drawRect(diagonalLight(size, listOf(Color.Transparent, Color.Black.copy(alpha = .025f))))
+                drawRect(diagonalLight(size, listOf(Color.White.copy(alpha = .10f * lighting.light), Color.Transparent)))
+                drawRect(diagonalLight(size, listOf(Color.Transparent, Color.Black.copy(alpha = .025f * lighting.shade))))
             }
             .glassRing()
             .semantics { contentDescription = description; role = Role.Button; onClick { tap(); true }; onLongClick { expanded = true; true } }

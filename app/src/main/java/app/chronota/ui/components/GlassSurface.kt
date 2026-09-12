@@ -7,6 +7,8 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.luminance
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.layer.GraphicsLayer
 import androidx.compose.ui.graphics.layer.drawLayer
@@ -79,3 +81,17 @@ internal fun diagonalLight(size: Size, colors: List<Color>): Brush {
     val reach = (size.width + size.height) / 2f
     return Brush.linearGradient(colors, start = Offset.Zero, end = Offset(reach, reach))
 }
+
+/**
+ * How far to lean the light and its shade, per mode. White paper swallows a white highlight and shows
+ * every shadow at full strength; a dark pane does the opposite. So the recipe stays one recipe, and
+ * each mode scales it: the light up and the shade down in the light, the other way about in the dark.
+ */
+internal data class GlassLighting(val light: Float, val shade: Float)
+
+/** The palette in force, not the system's: the app can pin its own theme. */
+@Composable
+internal fun glassLighting(): GlassLighting = if (MaterialTheme.colorScheme.background.luminance() < .5f)
+    GlassLighting(light = .8f, shade = 1.3f)
+else
+    GlassLighting(light = 1.25f, shade = .7f)

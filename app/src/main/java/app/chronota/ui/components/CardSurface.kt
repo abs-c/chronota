@@ -55,6 +55,7 @@ private val SheetShadow = Color.Black.copy(alpha = .07f)
  */
 @Composable fun Modifier.glassRing(stroke: Dp = Metrics.outline, shape: Shape = CircleShape): Modifier {
     val separator = MaterialTheme.colorScheme.outlineVariant
+    val lighting = glassLighting()
     val layoutDirection = LocalLayoutDirection.current
     return clip(shape).drawWithContent {
         drawContent()
@@ -65,11 +66,11 @@ private val SheetShadow = Color.Black.copy(alpha = .07f)
         }
         val line = stroke.toPx()
         val lit = Brush.linearGradient(
-            listOf(Color.White.copy(alpha = .5f), Color.White.copy(alpha = .18f), Color.White.copy(alpha = .04f)),
+            listOf(Color.White.copy(alpha = .5f * lighting.light), Color.White.copy(alpha = .18f * lighting.light), Color.White.copy(alpha = .04f * lighting.light)),
             start = Offset(0f, 0f),
             end = Offset(size.width * .82f, size.height),
         )
-        drawPath(edge, brush = lit, alpha = .08f, style = Stroke(line * 3f))
+        drawPath(edge, brush = lit, alpha = .08f * lighting.light, style = Stroke(line * 3f))
         drawPath(edge, brush = lit, style = Stroke(line))
         drawPath(edge, brush = Brush.linearGradient(listOf(Color.Transparent, Color.Transparent, separator.copy(alpha = .34f))), style = Stroke(line))
     }

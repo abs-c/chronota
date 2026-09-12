@@ -61,6 +61,7 @@ fun GlassDock(route: String, navigate: (String) -> Unit, timer: TimerSession?, d
     var wheelOpen by remember { mutableStateOf(false) }
     // The highlight slides from one page to the next instead of jumping, so the light reads as one
     // thing moving rather than two blinking on and off.
+    val lighting = glassLighting()
     val light by animateFloatAsState(
         Destination.entries.indexOfFirst { it.route == route }.coerceAtLeast(0).toFloat(),
         spring(dampingRatio = .78f, stiffness = 320f),
@@ -84,8 +85,9 @@ fun GlassDock(route: String, navigate: (String) -> Unit, timer: TimerSession?, d
                 val inset = Space.xxs.toPx()
                 val item = (size.width - inset * 2) / Destination.entries.size
                 val centre = Offset(inset + (light + .5f) * item, size.height * .5f)
+                val lit = lighting.light
                 drawRect(Brush.radialGradient(
-                    listOf(Color.White.copy(alpha = .14f), Color.White.copy(alpha = .04f), Color.Transparent),
+                    listOf(Color.White.copy(alpha = .14f * lit), Color.White.copy(alpha = .04f * lit), Color.Transparent),
                     center = centre,
                     radius = item * 1.6f,
                 ))
@@ -93,7 +95,7 @@ fun GlassDock(route: String, navigate: (String) -> Unit, timer: TimerSession?, d
                 // are its darkest part. A pool of light with no shade under it reads as a sticker; the
                 // shade is what makes it sit on something with a thickness.
                 drawRect(Brush.radialGradient(
-                    listOf(Color.Transparent, Color.Transparent, Color.Black.copy(alpha = .04f)),
+                    listOf(Color.Transparent, Color.Transparent, Color.Black.copy(alpha = .04f * lighting.shade)),
                     center = centre,
                     radius = item * 2.6f,
                 ))
