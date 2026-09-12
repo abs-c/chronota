@@ -112,9 +112,7 @@ private object BodySlot
     val padding = FrostPaddingDp * density
     var bounds by remember { mutableStateOf(IntSize.Zero) }
     var origin by remember { mutableStateOf(Offset.Zero) }
-    val lighting = glassLighting()
     val base = MaterialTheme.colorScheme.background
-    val body = MaterialTheme.colorScheme.surfaceContainerHigh
     val edge = MaterialTheme.colorScheme.outlineVariant
     val effect = remember(bounds, density) {
         // A radius of 0 makes the lens's normal degenerate along the band's flat edges: the shader
@@ -156,18 +154,6 @@ private object BodySlot
                     1f to base.copy(alpha = bandAlpha(1f)),
                     startY = 0f,
                     endY = end,
-                )
-            )
-            // The glass's own body — one step off the page, so it has a tone rather than being only the
-            // page's grey fading out — fades in with the glass. Drawn flat it would sit on the solid
-            // header too, and a body colour is a wash: on a dark page that is a nine-level lift across
-            // the whole band, which is enough to squeeze the ramp and leave the header at #090909
-            // instead of the page's black. Anything that belongs to the glass has to arrive with it.
-            drawRect(
-                Brush.verticalGradient(
-                    0f to Color.Transparent,
-                    SolidFraction to Color.Transparent,
-                    1f to body.copy(alpha = .12f),
                 )
             )
         }
