@@ -1,7 +1,6 @@
 package app.chronota.ui.components
 
 import android.os.Build
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
@@ -10,10 +9,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.layer.GraphicsLayer
 import androidx.compose.ui.graphics.layer.drawLayer
+import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.positionInRoot
@@ -21,24 +22,23 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
-
-/** How far above the band's lower edge the sheet begins, inside the rim the lens bends. */
-private const val SheetEdgeDp = 9f
+import app.chronota.ui.theme.Metrics
 
 /**
- * A page with a date band across its top and the page's own body under it.
+ * A page with a band across its top and the page's own body under it.
  *
- * The band is a frosted window, not a painted strip: it shows the gray the page already has, and the
- * white sheet begins a little above its lower edge, so the frost of that boundary is what carries the
- * gray into the paper. That is the whole effect — there is no grey of the band's own to fade out, and
- * nothing of its colour can be left behind when the sheet changes.
+ * The band is glass over the schedule. Its lower [Metrics.bandGlass] is transparent, so the timeline
+ * that reaches up behind it is seen there and bent by the lens along its lower edge; above that the
+ * band closes into the page's grey, so the date and the week strip on it stay legible. A band that is
+ * glass all the way up has no surface for its own content to sit on, and a band that is grey all the
+ * way down has nothing to refract.
  *
- * The band reserves its own height, so the schedule starts below it. Content left behind the glass
- * comes back as a smeared patch of its own colour, which reads as a broken pixel rather than as glass.
+ * The body still starts below the band — nothing scrolls out from under it by accident. The timeline
+ * reaches up into the glass itself, which is the one thing that belongs there.
  *
- * The body is recorded into its own layer for the band to frost: sampling the backdrop the dock uses
- * is not possible here, because the band lives inside the page that backdrop is recorded from and
- * asking for it again recurses.
+ * The body is recorded into its own layer for the band to frost and bend: sampling the backdrop the
+ * dock uses is not possible here, because the band lives inside the page that backdrop is recorded
+ * from and asking for it again recurses.
  */
 @Composable
 fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() -> Unit) {
@@ -46,35 +46,29 @@ fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() 
     var origin by remember { mutableStateOf(Offset.Zero) }
     var bandPx by remember { mutableStateOf(0) }
     val density = LocalDensity.current
-    // The sheet begins this far above the band's lower edge, inside the rim the lens bends — that
-    // boundary is what the band's glass has to refract. Put it below the rim and the band's edge has
-    // nothing but one flat grey to magnify, which is why a band with no refraction looks painted on.
-    val blend = with(density) { SheetEdgeDp.dp }
     Box(Modifier.fillMaxSize()) {
         Box(Modifier.fillMaxSize()
             .onGloballyPositioned { origin = it.positionInRoot() }
             .drawWithContent { layer.record { this@drawWithContent.drawContent() }; drawLayer(layer) }) {
-            Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
-                Spacer(Modifier.height((with(density) { bandPx.toDp() } - blend).coerceAtLeast(0.dp)))
-                Column(Modifier.fillMaxWidth().weight(1f).sheetSurface()) {
-                    // The sheet's start is early, the schedule's is not: the frost gets its white
-                    // without any of the body rising into the band behind it.
-                    Spacer(Modifier.height(blend))
-                    body()
-                }
+            // The sheet runs the whole page, the band's own strip included: what the band has to
+            // refract is this sheet and whatever the schedule has scrolled up into it.
+            Column(Modifier.fillMaxSize().sheetSurface()) {
+                Spacer(Modifier.height(with(density) { bandPx.toDp() }))
+                body()
             }
         }
-        Box(Modifier.align(Alignment.TopStart).fillMaxWidth().onSizeChanged { bandPx = it.height }.clipToBounds().glassBand(layer, origin)) { band() }
+        Box(Modifier.align(Alignment.TopStart).fillMaxWidth().onSizeChanged { bandPx = it.height }.clipToBounds().glassBand(layer, origin)) {
+            // The band keeps room under its own content for the glass and the grey fading into it, so
+            // no band has to know how deep its glass is and none of them fades across its date row.
+            Column(Modifier.padding(bottom = Metrics.bandGlass * 2)) { band() }
+        }
     }
 }
 
 /**
- * The glass of the band: the page's gray above, the sheet's white below, and the lens along the
- * band's lower edge magnifying the boundary between them. Nothing is painted over it — the material
- * is the frost and the bend.
- *
- * The lens layer is padded so the frost is not clamped at its rim; the band clips the result
- * (`clipToBounds`), or the glass would reach over the sheet's first row and bend what is on it.
+ * The band's glass: the lens over the whole band, then the page's grey closing over it towards the
+ * top. What is left transparent at the lower edge is where the schedule shows through, bending with
+ * the lens.
  */
 @Composable fun Modifier.glassBand(backdrop: GraphicsLayer, backdropOrigin: Offset): Modifier {
     val lens = rememberGraphicsLayer()
@@ -82,6 +76,7 @@ fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() 
     val padding = FrostPaddingDp * density
     var bounds by remember { mutableStateOf(IntSize.Zero) }
     var origin by remember { mutableStateOf(Offset.Zero) }
+    val base = MaterialTheme.colorScheme.background
     val effect = remember(bounds, density) {
         // A radius of 0 makes the lens's normal degenerate along the band's flat edges: the shader
         // normalises an empty vector there and the bend comes out as nothing at all. A hair of a
@@ -98,6 +93,19 @@ fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() 
             }
             translate(-padding, -padding) { drawLayer(lens) }
         }
+        // Solid grey by the top, nothing left by the time it reaches the glass.
+        val strip = Metrics.bandGlass.toPx()
+        val glassTop = (size.height - strip).coerceAtLeast(1f)
+        val solidTop = (size.height - 2 * strip).coerceAtLeast(0f)
+        drawRect(
+            Brush.verticalGradient(
+                0f to base,
+                (solidTop / glassTop).coerceIn(0f, 1f) to base,
+                1f to Color.Transparent,
+                startY = 0f,
+                endY = glassTop,
+            )
+        )
         drawContent()
     }
 }

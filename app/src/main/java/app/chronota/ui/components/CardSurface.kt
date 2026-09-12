@@ -71,6 +71,6 @@ private val SheetShadow = Color.Black.copy(alpha = .07f)
         )
         drawPath(edge, brush = lit, alpha = .14f, style = Stroke(line * 5f))
         drawPath(edge, brush = lit, style = Stroke(line))
-        drawPath(edge, brush = Brush.linearGradient(listOf(Color.Transparent, Color.Transparent, separator.copy(alpha = .5f))), style = Stroke(line))
+        drawPath(edge, brush = Brush.linearGradient(listOf(Color.Transparent, Color.Transparent, separator.copy(alpha = .22f))), style = Stroke(line))
     }
 }
