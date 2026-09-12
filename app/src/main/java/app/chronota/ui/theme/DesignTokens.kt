@@ -82,6 +82,8 @@ object Metrics {
     val dockHeight = 56.dp
     val dockClearance = 112.dp
     val orb = dockHeight
+    /** A little larger than the orb itself: the wheel's balls carry a label as well as an icon. */
+    val wheelOrb = 64.dp
     val wheelRadius = 176.dp
     val wheelSize = 268.dp
 

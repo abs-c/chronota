@@ -86,9 +86,9 @@ private val SheetShadow = Color.Black.copy(alpha = .07f)
         )
         val lit = if (lightCentre != null) Brush.radialGradient(litColors, center = lightCentre, radius = lightReach.coerceAtLeast(1f))
         else diagonalLight(size, litColors)
-        drawPath(edge, brush = lit, alpha = .08f * lighting.light, style = Stroke(line * 3f))
+        drawPath(edge, brush = lit, alpha = .12f * lighting.light, style = Stroke(line * 3f))
         drawPath(edge, brush = lit, style = Stroke(line))
-        val shade = listOf(Color.Transparent, Color.Transparent, separator.copy(alpha = .34f * lighting.shade))
+        val shade = listOf(Color.Transparent, Color.Transparent, separator.copy(alpha = .4f * lighting.shade))
         drawPath(
             edge,
             brush = if (lightCentre != null) Brush.radialGradient(shade, center = lightCentre, radius = (lightReach * 1.4f).coerceAtLeast(1f))

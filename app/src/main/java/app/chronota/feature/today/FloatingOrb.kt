@@ -80,12 +80,12 @@ fun FloatingOrb(timer: TimerSession?, defaultAction: OrbAction, onAction: (OrbAc
                     val angle = Math.toRadians(wheelAngle(index))
                     val selected = highlighted == action
                     Column(Modifier.align(Alignment.BottomEnd).offset { IntOffset((-radius * expansion * cos(angle)).roundToInt(), (-radius * expansion * sin(angle)).roundToInt()) }
-                        .size(Metrics.orb).graphicsLayer { alpha = expansion.coerceIn(0f, 1f); scaleX = .7f + .3f * expansion; scaleY = scaleX }.clip(CircleShape)
+                        .size(Metrics.wheelOrb).graphicsLayer { alpha = expansion.coerceIn(0f, 1f); scaleX = .7f + .3f * expansion; scaleY = scaleX }.clip(CircleShape)
                         // The orb's own material, without its stain: same body, same light, same shade,
                         // same rim. Which action is under the finger is said by the icon and the label,
                         // the way the dock says which page you are on — not by a disc of colour laid over
                         // the glass, which is louder than anything else on the page.
-                        .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.surfaceContainerHigh, tintAlpha = .18f)
+                        .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.surfaceContainerHigh, tintAlpha = .22f)
                         .drawWithContent {
                             drawContent()
                             drawRect(diagonalLight(size, listOf(Color.White.copy(alpha = .10f * lighting.light), Color.Transparent)))
@@ -112,7 +112,7 @@ fun FloatingOrb(timer: TimerSession?, defaultAction: OrbAction, onAction: (OrbAc
         // direction as every other piece of glass on the page.
         val stain = MaterialTheme.colorScheme.primary
         Box(Modifier.size(Metrics.orb).graphicsLayer { scaleX = pressScale; scaleY = pressScale }.clip(CircleShape)
-            .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.surfaceContainerHigh, tintAlpha = .18f)
+            .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.surfaceContainerHigh, tintAlpha = .22f)
             .drawWithContent {
                 drawContent()
                 drawRect(stain.copy(alpha = .12f))

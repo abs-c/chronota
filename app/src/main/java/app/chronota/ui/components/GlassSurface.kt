@@ -94,4 +94,4 @@ internal data class GlassLighting(val light: Float, val shade: Float)
 internal fun glassLighting(): GlassLighting = if (MaterialTheme.colorScheme.background.luminance() < .5f)
     GlassLighting(light = .8f, shade = 1.3f)
 else
-    GlassLighting(light = 1.25f, shade = .7f)
+    GlassLighting(light = 1.35f, shade = .85f)
