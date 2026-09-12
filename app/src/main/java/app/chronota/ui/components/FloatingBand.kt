@@ -25,11 +25,15 @@ import kotlin.math.roundToInt
 import app.chronota.ui.theme.Metrics
 
 /**
- * Where the band stops being solid grey and becomes glass: over its top third, which is the row the
- * title sits on. Everything below that is glass — that is the region the schedule is seen through —
- * and the grey is spent by the band's lower edge, where nothing of it is left over the sheet.
+ * Where the band's grey gives way to glass. It holds over the top third — the row the title sits on —
+ * and is spent by the band's middle, so everything below that, the week strip and the date row
+ * included, is clear glass with the schedule behind it. The band is glass from its lower edge up to
+ * here, which is most of its height; only the title's row is solid.
  */
 private const val SolidFraction = .3f
+
+/** And by here the grey is gone; below it the band is glass alone. */
+private const val ClearFraction = .5f
 
 
 /**
@@ -106,15 +110,14 @@ fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() 
             }
             translate(-padding, -padding) { drawLayer(lens) }
         }
-        // Grey over the top third — the row the title sits on — and then spent: everything under that
-        // is glass, which is the region the schedule behind it is seen through, and the grey is gone
-        // entirely by the lower edge, where nothing of it is left over the sheet.
-        val solidTop = size.height * SolidFraction
+        // Grey over the top third — the row the title sits on — and spent by the middle, so the band
+        // is glass from its lower edge up to here and the schedule behind it is seen through all of it.
         val end = size.height.coerceAtLeast(1f)
         drawRect(
             Brush.verticalGradient(
                 0f to base,
-                (solidTop / end).coerceIn(0f, 1f) to base,
+                SolidFraction to base,
+                ClearFraction to Color.Transparent,
                 1f to Color.Transparent,
                 startY = 0f,
                 endY = end,
