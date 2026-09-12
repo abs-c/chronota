@@ -150,11 +150,10 @@ object Metrics {
     /** Gap between a start and an end time, kept tight: they read as one range, not two rows. */
     val agendaTimeGap = 2.dp
     /**
-     * The week's hour gutter. Its labels are hour numbers rather than clock times, which is what lets
-     * it stay this narrow and hand the width to the seven day columns — but it still has to hold the
-     * marked form ("04" plus the raised marker).
+     * The week's hour gutter. It is the day view's column, label for label ("04:00" with the raised
+     * marker), so the two grids read as the same axis; the seven day columns take what is left.
      */
-    val weekGutter = Space.xl
+    val weekGutter = timelineGutter
     val calendarCell = 44.dp
     val calendarDay = 36.dp
     val monthDay = 44.dp

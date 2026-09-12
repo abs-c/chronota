@@ -89,7 +89,7 @@ fun TodayScreen(onSettings: () -> Unit, state: WorkspaceState = WorkspaceState()
     PageColumn(Modifier.background(MaterialTheme.colorScheme.surface)) {
         // The date band keeps the grouped background and casts the seam the paper slides under; the
         // schedule below it is the plain page.
-        if (showHeader) Column(Modifier.fillMaxWidth().bandSurface().padding(bottom = Space.sm)) {
+        if (showHeader) Column(Modifier.fillMaxWidth().bandSurface().padding(bottom = Space.xs)) {
         val locale = androidx.compose.ui.platform.LocalResources.current.configuration.locales[0]
         val monthPattern = if (locale.language == "zh") "yyyy 年 M 月" else "MMMM yyyy"
         Row(Modifier.fillMaxWidth().padding(start = Space.md, top = Space.xxs, end = Space.md), verticalAlignment = Alignment.CenterVertically) {
@@ -128,7 +128,8 @@ fun TodayScreen(onSettings: () -> Unit, state: WorkspaceState = WorkspaceState()
             }
             if (showRecords && !singleColumn) Spacer(Modifier.weight(1f))
         }
-        Spacer(Modifier.height(Space.xs))
+        // The lane labels hug the hours: they name the two columns, they are not a band of their own.
+        Spacer(Modifier.height(Space.xxs))
         Box(Modifier.weight(1f)) {
             Box(Modifier.fillMaxSize().topFade().verticalScroll(scroll).padding(horizontal = Space.md).padding(top = Space.sm).padding(bottom = Metrics.dockClearance)) {
                 Box(Modifier.fillMaxWidth().height(height)) {

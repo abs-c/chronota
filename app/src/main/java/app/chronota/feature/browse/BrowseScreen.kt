@@ -307,7 +307,7 @@ fun ModeTabs(labels: List<Int>, selected: Int, select: (Int) -> Unit, tag: Strin
         0 -> Column(Modifier.fillMaxSize().testTag("calendar_day")) {
             // The day keeps Today's week strip, so the two views read as the same one.
             WeekStrip(date, LocalDisplayPreferences.current.weekStart, { date = it }, { date = date.minusDays(1) }, { date = date.plusDays(1) })
-            Box(Modifier.weight(1f).padding(top = Space.sm).sheetSurface()) {
+            Box(Modifier.weight(1f).padding(top = Space.xs).sheetSurface()) {
                 TodayScreen({}, dayState, onPlan = { id, _ -> if (id != 0L) onPlan(id) else add(date) }, onRecord = { id, _ -> if (id != 0L) onRecord(id) else add(date) },
                     onCreatePlan = createPlan, onCreateRecord = createRecord, calendarCutoff = now, selectedDate = date, showHeader = false, showPlans = showPlans, showRecords = true, singleColumn = true)
             }
@@ -322,7 +322,7 @@ fun ModeTabs(labels: List<Int>, selected: Int, select: (Int) -> Unit, tag: Strin
                 // them with the all-day row, so the color changes below the dates rather than above.
                 WeekGridHeader(date)
                 WeekDateRow(date, weekSwipe) { date = it; scale = 0 }
-                Column(Modifier.weight(1f).padding(top = Space.sm).sheetSurface()) {
+                Column(Modifier.weight(1f).padding(top = Space.xs).sheetSurface()) {
                     WeekAllDayRow(date, entries, state, weekSwipe) { if (it.isPlan) onPlan(it.id) else onRecord(it.id) }
                     Column(Modifier.weight(1f).topFade().verticalScroll(rememberScrollState()).padding(top = Space.sm).padding(bottom = Metrics.dockClearance)) {
                         WeekGridBody(date, entries, state, weekSwipe) { if (it.isPlan) onPlan(it.id) else onRecord(it.id) }
@@ -535,10 +535,15 @@ fun ModeTabs(labels: List<Int>, selected: Int, select: (Int) -> Unit, tag: Strin
     val minEventHeight = minEventHeight(hourHeight)
 
     BoxWithConstraints(Modifier.fillMaxWidth().padding(horizontal = Space.md)) {
+    // The hour lines span the whole grid, gutter included, exactly as the day view draws them, so the
+    // times sit on a line in both views rather than beside one.
+    Box(Modifier.fillMaxWidth().height(hourHeight * 24)) {
+        repeat(24) { if (it > 0) HorizontalDivider(Modifier.offset(y = hourHeight * it), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = Metrics.gridAlpha)) }
+    }
     Row(Modifier.fillMaxWidth()) {
         // Sized for the marked form of the label ("04 ⁺¹"), so the marker stays inside the gutter.
         Column(Modifier.width(Metrics.weekGutter)) {
-            repeat(24) { Text(axisHourNumberText(LocalTime.ofSecondOfDay(dayStart * 60L).plusHours(it.toLong()), dayStart), Modifier.height(hourHeight).padding(start = Space.xxs), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1) }
+            repeat(24) { Text(axisHourText(LocalTime.ofSecondOfDay(dayStart * 60L).plusHours(it.toLong()), dayStart), Modifier.height(hourHeight).padding(top = Space.xxs), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1) }
         }
         // Only the day columns slide; the hour gutter on the left stays put.
         BoxWithConstraints(Modifier.weight(1f).height(hourHeight * 24).swipeTranslation(swipe)) {
@@ -548,7 +553,6 @@ fun ModeTabs(labels: List<Int>, selected: Int, select: (Int) -> Unit, tag: Strin
             val day = monday.plusDays(index.toLong())
             val span = daySpan(day, zone, dayStart)
             Box(Modifier.width(dayWidth).height(hourHeight * 24)) {
-                repeat(24) { HorizontalDivider(Modifier.offset(y = hourHeight * it), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = Metrics.gridAlpha)) }
                 val onDay = entries.filter { it.onDate(day, zone, dayStart) && !it.allDay }
                 val keyed = onDay.withIndex().associate { it.index.toLong() to it.value }
                 // Blocks keep their minimum while nothing follows, squeeze into the room beside a
