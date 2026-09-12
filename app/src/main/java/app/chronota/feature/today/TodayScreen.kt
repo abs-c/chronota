@@ -125,12 +125,10 @@ fun TodayScreen(onSettings: () -> Unit, state: WorkspaceState = WorkspaceState()
             }
             if (showRecords && !singleColumn) Spacer(Modifier.weight(1f))
         }
-        // The lane labels hug the hours: they name the two columns, they are not a band of their own.
-        Spacer(Modifier.height(Space.xxs))
-        // The band's glass hangs over the top of this: the schedule keeps its own bounds, so the top
-        // of it is seen through the glass and its lower edge still reaches the foot of the page.
         Box(Modifier.weight(1f)) {
-            Box(Modifier.fillMaxSize().topFade().verticalScroll(scroll).padding(horizontal = Space.md).padding(top = Space.sm).padding(bottom = Metrics.dockClearance)) {
+            // The schedule starts flush with the band's lower edge: no spacer and no top padding, or the page
+            // shows a strip of bare white between the band's grey and the first hour line.
+            Box(Modifier.fillMaxSize().verticalScroll(scroll).padding(horizontal = Space.md).padding(bottom = Metrics.dockClearance)) {
                 Box(Modifier.fillMaxWidth().height(height)) {
                     val hours = (day.millis / 3_600_000).toInt()
                     repeat(hours + 1) { hour ->
