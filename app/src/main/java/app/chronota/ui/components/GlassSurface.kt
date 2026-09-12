@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.IntSize
 import kotlin.math.roundToInt
 
 /** How far the frost spreads: enough to lose a grid line, small enough to keep the page's colour. */
-internal const val FrostRadiusDp = 3f
+internal const val FrostRadiusDp = 2f
 
 /** Room around a glass surface for the frost to reach into, so its edges are not clamped. */
 internal const val FrostPaddingDp = 40f
@@ -103,3 +103,10 @@ internal fun glassLighting(): GlassLighting = if (MaterialTheme.colorScheme.back
     GlassLighting(light = .8f, shade = 1.3f, wash = .10f)
 else
     GlassLighting(light = 1.35f, shade = .85f, wash = .40f)
+
+/**
+ * How much of its own colour a piece of glass carries. One value for all of them — the dock, the
+ * orb, the balls that come out of it — so that none of them is a different thickness from the rest;
+ * the band is the exception, because its body is the page's own grey thinning out.
+ */
+internal const val GlassBodyAlpha = .22f

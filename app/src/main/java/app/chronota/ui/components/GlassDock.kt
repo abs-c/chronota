@@ -84,7 +84,7 @@ fun GlassDock(route: String, navigate: (String) -> Unit, timer: TimerSession?, d
             // than the sheet in the light and a shade lighter than it in the dark, so the pane has a
             // body of its own and the rim's light has something to land on. A white wash on white, and
             // a black wash on black, are both nothing at all.
-            .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.surfaceContainerHigh, tintAlpha = .22f)
+            .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.surfaceContainerHigh, tintAlpha = GlassBodyAlpha)
             .drawWithContent {
                 drawContent()
                 // One light on the dock, and it comes from the page you are on: a pool that spreads out

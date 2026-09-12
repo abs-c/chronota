@@ -35,6 +35,7 @@ import app.chronota.data.entity.TimerSession
 import app.chronota.domain.*
 import app.chronota.ui.components.glassRing
 import app.chronota.ui.components.diagonalLight
+import app.chronota.ui.components.GlassBodyAlpha
 import app.chronota.ui.components.glassLighting
 import app.chronota.ui.components.glassSurface
 import app.chronota.ui.components.AppIcons
@@ -85,7 +86,7 @@ fun FloatingOrb(timer: TimerSession?, defaultAction: OrbAction, onAction: (OrbAc
                         // same rim. Which action is under the finger is said by the icon and the label,
                         // the way the dock says which page you are on — not by a disc of colour laid over
                         // the glass, which is louder than anything else on the page.
-                        .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.surfaceContainerHigh, tintAlpha = .45f)
+                        .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.surfaceContainerHigh, tintAlpha = GlassBodyAlpha)
                         .drawWithContent {
                             drawContent()
                             drawRect(diagonalLight(size, listOf(Color.White.copy(alpha = lighting.wash), Color.Transparent)))
@@ -112,7 +113,7 @@ fun FloatingOrb(timer: TimerSession?, defaultAction: OrbAction, onAction: (OrbAc
         // direction as every other piece of glass on the page.
         val stain = MaterialTheme.colorScheme.primary
         Box(Modifier.size(Metrics.orb).graphicsLayer { scaleX = pressScale; scaleY = pressScale }.clip(CircleShape)
-            .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.surfaceContainerHigh, tintAlpha = .22f)
+            .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.surfaceContainerHigh, tintAlpha = GlassBodyAlpha)
             .drawWithContent {
                 drawContent()
                 drawRect(stain.copy(alpha = .12f))
