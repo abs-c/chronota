@@ -31,7 +31,7 @@ internal fun liquidGlassEffect(size: IntSize, padding: Float, density: Float, co
         setFloatUniform("offset", -padding, -(padding - topOverhang))
         setFloatUniform("cornerRadii", cornerRadius, cornerRadius, cornerRadius, cornerRadius)
         setFloatUniform("rimHeight", min(RimHeightDp * density, shortSide * .34f).coerceAtLeast(1f))
-        setFloatUniform("rimBend", min(RimBendDp * density, shortSide * .2f).coerceAtLeast(1f))
+        setFloatUniform("rimBend", min(RimBendDp * density, shortSide * .28f).coerceAtLeast(1f))
         setFloatUniform("depthEffect", .12f)
     }
     val lens = RenderEffect.createRuntimeShaderEffect(shader, "content")
@@ -42,7 +42,7 @@ internal fun liquidGlassEffect(size: IntSize, padding: Float, density: Float, co
 }
 
 /** How deep into the surface the rim's bend reaches. */
-private const val RimHeightDp = 24f
+private const val RimHeightDp = 28f
 
 /** How far the backdrop is pulled in at the very edge. */
-private const val RimBendDp = 15f
+private const val RimBendDp = 20f
