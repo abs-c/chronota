@@ -5,6 +5,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.layer.GraphicsLayer
@@ -64,4 +65,17 @@ fun Modifier.glassSurface(backdrop: GraphicsLayer?, backdropOrigin: Offset, tint
         drawRect(tint.copy(alpha = if (opaque) .88f else tintAlpha))
         drawContent()
     }
+}
+
+/**
+ * The axis every light on the glass runs along: 45°, no matter the shape's proportions.
+ *
+ * A gradient from the top-left corner to the bottom-right one only reads as a diagonal while the
+ * surface is roughly square. On a bar a thousand wide and fifty tall that same gradient is almost
+ * horizontal, and the light comes in from the side instead of the corner. Projecting the shape onto
+ * the 45° axis — half of width plus height — keeps the direction the same on a bar, a pill and a disc.
+ */
+internal fun diagonalLight(size: Size, colors: List<Color>): Brush {
+    val reach = (size.width + size.height) / 2f
+    return Brush.linearGradient(colors, start = Offset.Zero, end = Offset(reach, reach))
 }

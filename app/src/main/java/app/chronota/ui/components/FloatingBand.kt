@@ -90,6 +90,7 @@ fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() 
     var bounds by remember { mutableStateOf(IntSize.Zero) }
     var origin by remember { mutableStateOf(Offset.Zero) }
     val base = MaterialTheme.colorScheme.background
+    val body = MaterialTheme.colorScheme.surfaceContainerHigh
     val edge = MaterialTheme.colorScheme.outlineVariant
     val effect = remember(bounds, density) {
         // A radius of 0 makes the lens's normal degenerate along the band's flat edges: the shader
@@ -126,6 +127,11 @@ fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() 
                     endY = end,
                 )
             )
+            // The same body the dock carries, at half the strength: one step off the page, so the
+            // band's glass has a tone of its own instead of being only the page's grey fading out.
+            drawRect(body.copy(alpha = .12f))
+            // And one light on it, from the corner, along the same 45° axis as every other piece.
+            drawRect(diagonalLight(size, listOf(Color.White.copy(alpha = .06f), Color.Transparent)))
         }
         drawContent()
     }

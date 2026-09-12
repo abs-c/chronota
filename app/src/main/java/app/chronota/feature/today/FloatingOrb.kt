@@ -34,6 +34,7 @@ import app.chronota.R
 import app.chronota.data.entity.TimerSession
 import app.chronota.domain.*
 import app.chronota.ui.components.glassRing
+import app.chronota.ui.components.diagonalLight
 import app.chronota.ui.components.glassSurface
 import app.chronota.ui.components.AppIcons
 import app.chronota.ui.theme.Metrics
@@ -102,16 +103,8 @@ fun FloatingOrb(timer: TimerSession?, defaultAction: OrbAction, onAction: (OrbAc
             .drawWithContent {
                 drawContent()
                 drawRect(stain.copy(alpha = .12f))
-                drawRect(Brush.linearGradient(
-                    listOf(Color.White.copy(alpha = .12f), Color.Transparent),
-                    start = Offset.Zero,
-                    end = Offset(size.width * .8f, size.height),
-                ))
-                drawRect(Brush.linearGradient(
-                    listOf(Color.Transparent, Color.Black.copy(alpha = .03f)),
-                    start = Offset(size.width * .2f, 0f),
-                    end = Offset(size.width, size.height),
-                ))
+                drawRect(diagonalLight(size, listOf(Color.White.copy(alpha = .12f), Color.Transparent)))
+                drawRect(diagonalLight(size, listOf(Color.Transparent, Color.Black.copy(alpha = .03f))))
             }
             .glassRing()
             .semantics { contentDescription = description; role = Role.Button; onClick { tap(); true }; onLongClick { expanded = true; true } }

@@ -7,6 +7,8 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.annotation.StringRes
@@ -57,6 +59,13 @@ fun GlassDock(route: String, navigate: (String) -> Unit, timer: TimerSession?, d
     val labels = Destination.entries.map { it.label }
     val icons = Destination.entries.map { it.icon }
     var wheelOpen by remember { mutableStateOf(false) }
+    // The highlight slides from one page to the next instead of jumping, so the light reads as one
+    // thing moving rather than two blinking on and off.
+    val light by animateFloatAsState(
+        Destination.entries.indexOfFirst { it.route == route }.coerceAtLeast(0).toFloat(),
+        spring(dampingRatio = .78f, stiffness = 320f),
+        label = "dockLight",
+    )
     Row(Modifier.fillMaxWidth().padding(horizontal = Space.md, vertical = Space.lg), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(Space.sm)) {
         Box(Modifier.weight(1f).requiredHeight(Metrics.dockHeight).testTag("glass_dock")
             .graphicsLayer { alpha = if (wheelOpen) 0f else 1f }
@@ -68,17 +77,25 @@ fun GlassDock(route: String, navigate: (String) -> Unit, timer: TimerSession?, d
             .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.surfaceContainerHigh, tintAlpha = .18f)
             .drawWithContent {
                 drawContent()
-                // Light from the upper left and shade to the lower right, the same direction as the
-                // rim: one light for the whole material.
-                drawRect(Brush.linearGradient(
-                    listOf(Color.White.copy(alpha = .12f), Color.Transparent),
-                    start = Offset.Zero,
-                    end = Offset(size.width * .8f, size.height),
+                // One light on the dock, and it comes from the page you are on: a pool that spreads out
+                // of that item to both sides and slides along when you change pages. Everything else on
+                // the dock is material — the body, the rim — so there is no second light to disagree
+                // with this one.
+                val inset = Space.xxs.toPx()
+                val item = (size.width - inset * 2) / Destination.entries.size
+                val centre = Offset(inset + (light + .5f) * item, size.height * .5f)
+                drawRect(Brush.radialGradient(
+                    listOf(Color.White.copy(alpha = .18f), Color.White.copy(alpha = .05f), Color.Transparent),
+                    center = centre,
+                    radius = item * 1.6f,
                 ))
-                drawRect(Brush.linearGradient(
-                    listOf(Color.Transparent, Color.Black.copy(alpha = .03f)),
-                    start = Offset(size.width * .2f, 0f),
-                    end = Offset(size.width, size.height),
+                // And the shade that light leaves: the pane falls away from it, so the ends of the dock
+                // are its darkest part. A pool of light with no shade under it reads as a sticker; the
+                // shade is what makes it sit on something with a thickness.
+                drawRect(Brush.radialGradient(
+                    listOf(Color.Transparent, Color.Transparent, Color.Black.copy(alpha = .05f)),
+                    center = centre,
+                    radius = item * 2.6f,
                 ))
             }
             .glassRing()) {
