@@ -24,17 +24,21 @@ import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 import app.chronota.ui.theme.Metrics
 
+/** The glass is on from here down: the band keeps its colour, and its colour is now a stain. */
+private const val BandGlassEnabled = true
+
 /**
- * Where the band's grey gives way to glass. It holds over the top third — the row the title sits on —
- * and is spent by the band's middle, so everything below that, the week strip and the date row
- * included, is clear glass with the schedule behind it. The band is glass from its lower edge up to
- * here, which is most of its height; only the title's row is solid.
+ * Where the band's glass begins, as a fraction of its height — the title's baseline, which is where
+ * the band stops being a header and starts being a window on the schedule (154px of 374px on the
+ * emulator, at a 63px inset). Above it the band is its opaque self.
  */
 private const val SolidFraction = .3f
 
-/** And by here the grey is gone; below it the band is glass alone. */
-private const val ClearFraction = .5f
+/** The grey's alpha in the glass: high, because the band is still grey — it is stained, not removed. */
+private const val BandTint = 1f
 
+/** A few dp of taper at that line, so the change of material is not a seam drawn across the band. */
+private const val TaperDp = 4f
 
 /**
  * A page with a band across its top and the page's own body under it.
@@ -59,32 +63,27 @@ fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() 
     var origin by remember { mutableStateOf(Offset.Zero) }
     var bandPx by remember { mutableStateOf(0) }
     val density = LocalDensity.current
-    val glass = Metrics.bandGlass
     Box(Modifier.fillMaxSize()) {
         Box(Modifier.fillMaxSize()
             .onGloballyPositioned { origin = it.positionInRoot() }
             .drawWithContent { layer.record { this@drawWithContent.drawContent() }; drawLayer(layer) }) {
-            // The sheet runs the whole page, the band's own strip included: what the band has to
-            // refract is this sheet and the top of the schedule, which sits under the band's glass.
+            // The body starts at the band's lower edge, or at the glass's own line when that glass can
+            // be seen through. There is no point putting the schedule behind a stain that shows
+            // nothing: it would only bury the top of the timeline under an opaque band.
+            val bodyFrom = if (BandGlassEnabled && BandTint < 1f) SolidFraction else 1f
             Column(Modifier.fillMaxSize().sheetSurface()) {
-                Spacer(Modifier.height((with(density) { bandPx.toDp() } - glass).coerceAtLeast(0.dp)))
+                Spacer(Modifier.height(with(density) { (bandPx * bodyFrom).toDp() }))
                 body()
             }
         }
-        // The band is its content plus a strip of glass below it. That strip hangs over the top of the
-        // schedule; the schedule does not reach up into it, because moving the timeline's own bounds
-        // to get under the glass moved its lower edge with them and left a band of bare white page
-        // where the schedule used to reach.
-        Column(Modifier.align(Alignment.TopStart).fillMaxWidth().onSizeChanged { bandPx = it.height }.clipToBounds().glassBand(layer, origin)) {
-            band()
-            Spacer(Modifier.height(glass))
-        }
+        // The band is its own content.
+        Box(Modifier.align(Alignment.TopStart).fillMaxWidth().onSizeChanged { bandPx = it.height }.clipToBounds().glassBand(layer, origin)) { band() }
     }
 }
 
 /**
- * The band's glass: the lens over the whole band, then the page's grey closing over it towards the
- * top. The clear part at the lower edge is where the schedule shows through as it passes under.
+ * The band: flat grey across its content, and — once the glass is on — the lens over it with the grey
+ * giving way towards the bottom, and an edge where it meets the sheet.
  */
 @Composable fun Modifier.glassBand(backdrop: GraphicsLayer, backdropOrigin: Offset): Modifier {
     val lens = rememberGraphicsLayer()
@@ -98,8 +97,9 @@ fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() 
         // A radius of 0 makes the lens's normal degenerate along the band's flat edges: the shader
         // normalises an empty vector there and the bend comes out as nothing at all. A hair of a
         // radius keeps it well defined, and the band's own corners are off the sides of the screen.
-        if (Build.VERSION.SDK_INT >= 33 && bounds.width > 0 && bounds.height > 0) liquidGlassEffect(bounds, padding, density, 2f * density)
-        else frostEffect(density)
+        if (BandGlassEnabled && Build.VERSION.SDK_INT >= 33 && bounds.width > 0 && bounds.height > 0) liquidGlassEffect(bounds, padding, density, 2f * density)
+        else if (BandGlassEnabled) frostEffect(density)
+        else null
     }
     SideEffect { lens.renderEffect = effect }
     return onSizeChanged { bounds = it }.onGloballyPositioned { origin = it.positionInRoot() }.drawWithContent {
@@ -110,44 +110,30 @@ fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() 
             }
             translate(-padding, -padding) { drawLayer(lens) }
         }
-        // Grey over the top third — the row the title sits on — and spent by the middle, so the band
-        // is glass from its lower edge up to here and the schedule behind it is seen through all of it.
-        val end = size.height.coerceAtLeast(1f)
-        drawRect(
-            Brush.verticalGradient(
-                0f to base,
-                SolidFraction to base,
-                ClearFraction to Color.Transparent,
-                1f to Color.Transparent,
-                startY = 0f,
-                endY = end,
+        if (!BandGlassEnabled) {
+            // The band is the page's grey and nothing else.
+            drawRect(base)
+        } else {
+            // The band is the same grey it was, all the way down: opaque above the title's baseline,
+            // and from there a stain of exactly that grey over the glass. The eye cannot tell the two
+            // apart — 242 where it is opaque, 244 where it is stained — so the band has not changed
+            // its colour or its look; what has changed is that from the baseline down it is glass, and
+            // the schedule passing behind it is seen there and bent by the lens.
+            val end = size.height.coerceAtLeast(1f)
+            val glassFrom = size.height * SolidFraction
+            val taper = TaperDp * density
+            val stained = (glassFrom + taper) / end
+            drawRect(
+                Brush.verticalGradient(
+                    0f to base,
+                    (glassFrom / end).coerceIn(0f, 1f) to base,
+                    stained.coerceIn(0f, 1f) to base.copy(alpha = BandTint),
+                    1f to base.copy(alpha = BandTint),
+                    startY = 0f,
+                    endY = end,
+                )
             )
-        )
-        // The edge where the glass meets the sheet: the pane's lit inner side along the very lip,
-        // above it the shade the glass gathers, both soft at the ends so the edge is an edge and not
-        // a rule drawn across the page.
-        val hairline = Metrics.hairline.toPx()
-        val lip = 9.dp.toPx()
-        drawRect(
-            Brush.verticalGradient(
-                listOf(Color.Transparent, Color.Black.copy(alpha = .05f)),
-                startY = (size.height - lip).coerceAtLeast(0f),
-                endY = size.height,
-            )
-        )
-        val edgeY = size.height - hairline
-        drawLine(
-            brush = Brush.horizontalGradient(listOf(Color.Transparent, Color.White.copy(alpha = .75f), Color.White.copy(alpha = .9f), Color.White.copy(alpha = .75f), Color.Transparent)),
-            start = Offset(0f, edgeY - hairline * 2),
-            end = Offset(size.width, edgeY - hairline * 2),
-            strokeWidth = hairline * 2,
-        )
-        drawLine(
-            brush = Brush.horizontalGradient(listOf(Color.Transparent, edge.copy(alpha = .55f), Color.Transparent)),
-            start = Offset(0f, edgeY),
-            end = Offset(size.width, edgeY),
-            strokeWidth = hairline,
-        )
+        }
         drawContent()
     }
 }
