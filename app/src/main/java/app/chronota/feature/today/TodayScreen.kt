@@ -86,7 +86,7 @@ fun TodayScreen(onSettings: () -> Unit, state: WorkspaceState = WorkspaceState()
     // The date band keeps the grouped page; the schedule under it is the page's body, a white sheet
     // whose top edge the band's shadow falls across.
     PageColumn() {
-        if (showHeader) Column(Modifier.fillMaxWidth().padding(bottom = Space.xs)) {
+        if (showHeader) Column(Modifier.fillMaxWidth().glassBand().padding(bottom = Space.xs)) {
         val locale = androidx.compose.ui.platform.LocalResources.current.configuration.locales[0]
         val monthPattern = if (locale.language == "zh") "yyyy 年 M 月" else "MMMM yyyy"
         Row(Modifier.fillMaxWidth().padding(start = Space.md, top = Space.xxs, end = Space.md), verticalAlignment = Alignment.CenterVertically) {
@@ -102,7 +102,7 @@ fun TodayScreen(onSettings: () -> Unit, state: WorkspaceState = WorkspaceState()
         // The same strip the calendar's day view draws, so both turn the week the same way.
         if (weekView) WeekStrip(date, preferences.weekStart, { date = it }, { date = date.minusWeeks(1) }, { date = date.plusWeeks(1) })
         }
-        Box(if (showHeader) Modifier.weight(1f).sheetSurface().seamShadow() else Modifier.weight(1f)) {
+        Box(if (showHeader) Modifier.weight(1f).sheetSurface() else Modifier.weight(1f)) {
             Column(Modifier.fillMaxSize()) {
         if (!singleColumn) Row(Modifier.fillMaxWidth().padding(vertical = Space.xxs)) {
             if (showPlans) Box(Modifier.weight(1f).padding(start = Metrics.timelineGutter)) { Text(stringResource(R.string.plan), style = MaterialTheme.typography.labelMedium) }

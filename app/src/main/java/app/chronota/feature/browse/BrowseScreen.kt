@@ -305,9 +305,10 @@ fun ModeTabs(labels: List<Int>, selected: Int, select: (Int) -> Unit, tag: Strin
     }
     when (scale) {
         0 -> Column(Modifier.fillMaxSize().testTag("calendar_day")) {
-            // The day keeps Today's week strip, so the two views read as the same one.
-            WeekStrip(date, LocalDisplayPreferences.current.weekStart, { date = it }, { date = date.minusDays(1) }, { date = date.plusDays(1) })
-            Box(Modifier.weight(1f).padding(top = Space.xs).sheetSurface().seamShadow()) {
+            // The day keeps Today's week strip, and like Today's it is the page's glass band: solid at
+            // the top, clear where the dates meet the hours.
+            WeekStrip(date, LocalDisplayPreferences.current.weekStart, { date = it }, { date = date.minusDays(1) }, { date = date.plusDays(1) }, Modifier.glassBand())
+            Box(Modifier.weight(1f).padding(top = Space.xs).sheetSurface()) {
                 TodayScreen({}, dayState, onPlan = { id, _ -> if (id != 0L) onPlan(id) else add(date) }, onRecord = { id, _ -> if (id != 0L) onRecord(id) else add(date) },
                     onCreatePlan = createPlan, onCreateRecord = createRecord, calendarCutoff = now, selectedDate = date, showHeader = false, showPlans = showPlans, showRecords = true, singleColumn = true)
             }
@@ -318,11 +319,13 @@ fun ModeTabs(labels: List<Int>, selected: Int, select: (Int) -> Unit, tag: Strin
             // the numbers a swipe is read against never move.
             val weekSwipe = rememberSwipeController()
             Column(Modifier.fillMaxSize().swipeGestures(weekSwipe, { date = date.minusWeeks(1) }, { date = date.plusWeeks(1) })) {
-                // The weekday names and the dates stay on the grouped page, and the sheet starts under
-                // them with the all-day row, so the color changes below the dates rather than above.
-                WeekGridHeader(date)
-                WeekDateRow(date, weekSwipe) { date = it; scale = 0 }
-                Column(Modifier.weight(1f).padding(top = Space.xs).sheetSurface().seamShadow()) {
+                // The weekday names and the dates are the page's glass band, and the sheet starts under
+                // them with the all-day row.
+                Column(Modifier.fillMaxWidth().glassBand()) {
+                    WeekGridHeader(date)
+                    WeekDateRow(date, weekSwipe) { date = it; scale = 0 }
+                }
+                Column(Modifier.weight(1f).padding(top = Space.xs).sheetSurface()) {
                     WeekAllDayRow(date, entries, state, weekSwipe) { if (it.isPlan) onPlan(it.id) else onRecord(it.id) }
                     Column(Modifier.weight(1f).topFade().verticalScroll(rememberScrollState()).padding(top = Space.sm).padding(bottom = Metrics.dockClearance)) {
                         WeekGridBody(date, entries, state, weekSwipe) { if (it.isPlan) onPlan(it.id) else onRecord(it.id) }

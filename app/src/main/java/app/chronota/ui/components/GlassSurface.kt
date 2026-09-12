@@ -16,8 +16,14 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntSize
 import kotlin.math.roundToInt
 
+/**
+ * The liquid glass the dock and the orb are made of.
+ *
+ * [tintAlpha] is how much of [tint] is laid over the refraction — lower is more transparent, and the
+ * opaque fallback on old devices ignores it.
+ */
 @Composable
-fun Modifier.glassSurface(backdrop: GraphicsLayer?, backdropOrigin: Offset, tint: Color): Modifier {
+fun Modifier.glassSurface(backdrop: GraphicsLayer?, backdropOrigin: Offset, tint: Color, tintAlpha: Float = .22f): Modifier {
     val layer = rememberGraphicsLayer()
     val density = LocalDensity.current.density
     val padding = 24f * density
@@ -25,11 +31,12 @@ fun Modifier.glassSurface(backdrop: GraphicsLayer?, backdropOrigin: Offset, tint
     var origin by remember { mutableStateOf(Offset.Zero) }
     val effect = remember(bounds, density) {
         if (Build.VERSION.SDK_INT >= 33 && bounds.width > 0 && bounds.height > 0)
-            liquidGlassEffect(bounds, padding, density)
+            liquidGlassEffect(bounds, padding, density, bounds.height / 2f)
         else BlurEffect(8f * density, 8f * density, TileMode.Clamp)
     }
     SideEffect { layer.renderEffect = effect }
     return onSizeChanged { bounds = it }.onGloballyPositioned { origin = it.positionInRoot() }.drawWithContent {
+        val opaque = backdrop == null || Build.VERSION.SDK_INT < 31
         if (backdrop != null) {
             val offset = origin - backdropOrigin
             layer.record(size = IntSize((size.width + 2 * padding).roundToInt(), (size.height + 2 * padding).roundToInt())) {
@@ -37,7 +44,7 @@ fun Modifier.glassSurface(backdrop: GraphicsLayer?, backdropOrigin: Offset, tint
             }
             translate(-padding, -padding) { drawLayer(layer) }
         }
-        drawRect(tint.copy(alpha = if (backdrop == null || Build.VERSION.SDK_INT < 31) .88f else .22f))
+        drawRect(tint.copy(alpha = if (opaque) .88f else tintAlpha))
         drawContent()
     }
 }

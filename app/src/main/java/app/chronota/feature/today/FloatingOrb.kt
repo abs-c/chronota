@@ -15,10 +15,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.shadow
 import androidx.compose.foundation.border
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -31,6 +33,7 @@ import androidx.compose.ui.unit.IntOffset
 import app.chronota.R
 import app.chronota.data.entity.TimerSession
 import app.chronota.domain.*
+import app.chronota.ui.components.glassRing
 import app.chronota.ui.components.glassSurface
 import app.chronota.ui.components.AppIcons
 import app.chronota.ui.theme.Metrics
@@ -74,7 +77,7 @@ fun FloatingOrb(timer: TimerSession?, defaultAction: OrbAction, onAction: (OrbAc
                     val angle = Math.toRadians(wheelAngle(index))
                     val selected = highlighted == action
                     Column(Modifier.align(Alignment.BottomEnd).offset { IntOffset((-radius * expansion * cos(angle)).roundToInt(), (-radius * expansion * sin(angle)).roundToInt()) }
-                        .size(Metrics.orb).graphicsLayer { alpha = expansion.coerceIn(0f, 1f); scaleX = .7f + .3f * expansion; scaleY = scaleX }.clip(CircleShape).glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.surfaceContainerHigh).background(if (selected) MaterialTheme.colorScheme.primary.copy(alpha = .8f) else Color.Transparent).border(Metrics.outline, MaterialTheme.colorScheme.outlineVariant, CircleShape)
+                        .size(Metrics.orb).graphicsLayer { alpha = expansion.coerceIn(0f, 1f); scaleX = .7f + .3f * expansion; scaleY = scaleX }.clip(CircleShape).glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.surfaceContainerHigh, tintAlpha = .16f).background(if (selected) MaterialTheme.colorScheme.primary.copy(alpha = .8f) else Color.Transparent).glassRing()
                         .testTag("wheel_${action.name}")
                         .semantics { onClick { execute(action); true } }, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                         TextButton(onClick = { execute(action) }, contentPadding = PaddingValues(), modifier = Modifier.fillMaxSize()) {
@@ -91,7 +94,17 @@ fun FloatingOrb(timer: TimerSession?, defaultAction: OrbAction, onAction: (OrbAc
         // No panel behind the elapsed time: it reads straight on the page.
         if (timer != null && !expanded) Text(timerElapsedText(timer.elapsed(now)),
             Modifier.align(Alignment.TopEnd).offset(y = -Metrics.orb / 2), style = MaterialTheme.typography.labelMedium)
-        Box(Modifier.size(Metrics.orb).graphicsLayer { scaleX = pressScale; scaleY = pressScale }.shadow(Metrics.floatingElevation, CircleShape, ambientColor = Color.Black.copy(alpha = .08f), spotColor = Color.Black.copy(alpha = .12f)).clip(CircleShape).background(MaterialTheme.colorScheme.primary).border(Metrics.hairline, Color.White.copy(alpha = .3f), CircleShape)
+        Box(Modifier.size(Metrics.orb).graphicsLayer { scaleX = pressScale; scaleY = pressScale }.shadow(Metrics.floatingElevation, CircleShape, ambientColor = Color.Black.copy(alpha = .10f), spotColor = Color.Black.copy(alpha = .16f)).clip(CircleShape)
+            .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.primary, tintAlpha = .82f)
+            .drawWithContent {
+                drawContent()
+                // A drop's sheen: the light catches the upper left, and the rim is lit from the top.
+                drawCircle(brush = Brush.radialGradient(listOf(Color.White.copy(alpha = .38f), Color.White.copy(alpha = .05f), Color.Transparent),
+                    center = Offset(size.width * .34f, size.height * .28f), radius = size.minDimension * .78f))
+                val width = Metrics.hairline.toPx()
+                drawCircle(brush = Brush.verticalGradient(listOf(Color.White.copy(alpha = .55f), Color.White.copy(alpha = .06f))),
+                    radius = size.minDimension / 2f - width / 2f, style = Stroke(width))
+            }
             .semantics { contentDescription = description; role = Role.Button; onClick { tap(); true }; onLongClick { expanded = true; true } }
             .testTag(if (fixedAction) if (defaultAction == OrbAction.PLAN) "add_plan" else "add_record" else "orb_primary").pointerInput(defaultAction, timer?.token, fixedAction) {
                 awaitEachGesture {

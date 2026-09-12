@@ -61,8 +61,8 @@ fun GlassDock(route: String, navigate: (String) -> Unit, timer: TimerSession?, d
         Box(Modifier.weight(1f).requiredHeight(Metrics.dockHeight).testTag("glass_dock")
             .graphicsLayer { alpha = if (wheelOpen) 0f else 1f }
             .shadow(Metrics.floatingElevation, CircleShape, ambientColor = Color.Black.copy(alpha = .08f), spotColor = Color.Black.copy(alpha = .12f)).clip(CircleShape)
-            .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.surface)
-            .border(Metrics.outline, MaterialTheme.colorScheme.outlineVariant, CircleShape)) {
+            .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.surface, tintAlpha = .16f)
+            .glassRing()) {
             Row(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface.copy(alpha = .08f)).padding(Space.xxs).selectableGroup()) {
                 routes.forEachIndexed { index, destination ->
                     val selected = route == destination

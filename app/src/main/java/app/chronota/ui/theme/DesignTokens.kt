@@ -56,10 +56,6 @@ object Metrics {
     val floatingElevation = 2.dp
     /** What a white sheet lifts off the grouped page by: a lift, not a drop shadow. */
     val cardElevation = 1.dp
-    /** A page's body lifts a little more, so the gray above it fades into the sheet instead of ending at an edge. */
-    val sheetElevation = 3.dp
-    /** How far the shadow under a band fades down the content below it. */
-    val seamFade = 14.dp
     /** A menu is opaque, so it needs a little more than the sheets to sit above them. */
     val menuElevation = 4.dp
     const val switchScale = .7f
