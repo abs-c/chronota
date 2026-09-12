@@ -58,11 +58,7 @@ fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() 
                 body()
             }
         }
-        Box(Modifier.align(Alignment.TopStart).fillMaxWidth().onSizeChanged { bandPx = it.height }.clipToBounds().glassBand(layer, origin)) {
-            // The band keeps the glass and the grey's fade below its own content, so every band has
-            // its glass under its date row whatever its content turned out to be.
-            Column(Modifier.padding(bottom = Metrics.bandGlass * 2)) { band() }
-        }
+        Box(Modifier.align(Alignment.TopStart).fillMaxWidth().onSizeChanged { bandPx = it.height }.clipToBounds().glassBand(layer, origin)) { band() }
     }
 }
 
@@ -93,18 +89,18 @@ fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() 
             }
             translate(-padding, -padding) { drawLayer(lens) }
         }
-        // Grey over the band's content, spent by the time it reaches the glass, so the band's lower
-        // edge is glass on the sheet rather than a grey strip painted over it.
-        val strip = Metrics.bandGlass.toPx()
-        val glassTop = (size.height - strip).coerceAtLeast(1f)
-        val solidTop = (size.height - 2 * strip).coerceAtLeast(0f)
+        // Grey across the band's content, then spent over the last [Metrics.bandGlass] of its height —
+        // from the date's baseline down to the lower edge — so that stretch of the band is glass
+        // resting on the sheet, and the schedule passing under it is seen there.
+        val solidTop = (size.height - Metrics.bandGlass.toPx()).coerceAtLeast(0f)
+        val end = size.height.coerceAtLeast(1f)
         drawRect(
             Brush.verticalGradient(
                 0f to base,
-                (solidTop / glassTop).coerceIn(0f, 1f) to base,
+                (solidTop / end).coerceIn(0f, 1f) to base,
                 1f to Color.Transparent,
                 startY = 0f,
-                endY = glassTop,
+                endY = end,
             )
         )
         drawContent()

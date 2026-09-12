@@ -94,10 +94,26 @@ fun FloatingOrb(timer: TimerSession?, defaultAction: OrbAction, onAction: (OrbAc
         // No panel behind the elapsed time: it reads straight on the page.
         if (timer != null && !expanded) Text(timerElapsedText(timer.elapsed(now)),
             Modifier.align(Alignment.TopEnd).offset(y = -Metrics.orb / 2), style = MaterialTheme.typography.labelMedium)
+        val stain = MaterialTheme.colorScheme.primary
         Box(Modifier.size(Metrics.orb).graphicsLayer { scaleX = pressScale; scaleY = pressScale }.shadow(Metrics.floatingElevation, CircleShape, ambientColor = Color.Black.copy(alpha = .06f), spotColor = Color.Black.copy(alpha = .10f)).clip(CircleShape)
-            // Clear glass rather than a painted disc: the page reads through the tint and the edge is
-            // the shared glass rim. No wash of white over it — that only bleached the colour out.
-            .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.primary, tintAlpha = .92f)
+            // Stained glass: the colour is a stain on the pane, not a coat of paint over it, so the
+            // page still reads through it. What lifts it out of being flat is the light — the pane is
+            // thicker at its rim, and one highlight where the light lands — never a white wash over
+            // the whole drop, which only bleaches the colour out.
+            .glassSurface(backdrop, backdropOrigin, stain, tintAlpha = .68f)
+            .drawWithContent {
+                drawContent()
+                drawCircle(brush = Brush.radialGradient(
+                    listOf(Color.Transparent, Color.Transparent, stain.copy(alpha = .3f)),
+                    center = center,
+                    radius = size.minDimension * .5f,
+                ))
+                drawCircle(brush = Brush.radialGradient(
+                    listOf(Color.White.copy(alpha = .26f), Color.White.copy(alpha = .04f), Color.Transparent),
+                    center = Offset(size.width * .33f, size.height * .27f),
+                    radius = size.minDimension * .5f,
+                ))
+            }
             .glassRing()
             .semantics { contentDescription = description; role = Role.Button; onClick { tap(); true }; onLongClick { expanded = true; true } }
             .testTag(if (fixedAction) if (defaultAction == OrbAction.PLAN) "add_plan" else "add_record" else "orb_primary").pointerInput(defaultAction, timer?.token, fixedAction) {
