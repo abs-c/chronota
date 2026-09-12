@@ -96,7 +96,7 @@ fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() 
         // A radius of 0 makes the lens's normal degenerate along the band's flat edges: the shader
         // normalises an empty vector there and the bend comes out as nothing at all. A hair of a
         // radius keeps it well defined, and the band's own corners are off the sides of the screen.
-        if (BandGlassEnabled && Build.VERSION.SDK_INT >= 33 && bounds.width > 0 && bounds.height > 0) liquidGlassEffect(bounds, padding, density, 2f * density)
+        if (BandGlassEnabled && Build.VERSION.SDK_INT >= 33 && bounds.width > 0 && bounds.height > 0) liquidGlassEffect(bounds, padding, density, 2f * density, topOverhang = padding)
         else if (BandGlassEnabled) frostEffect(density)
         else null
     }

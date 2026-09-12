@@ -20,11 +20,15 @@ import kotlin.math.min
  * one carved out of it.
  */
 @RequiresApi(33)
-internal fun liquidGlassEffect(size: IntSize, padding: Float, density: Float, cornerRadius: Float): ComposeRenderEffect {
+internal fun liquidGlassEffect(size: IntSize, padding: Float, density: Float, cornerRadius: Float, topOverhang: Float = 0f): ComposeRenderEffect {
     val shortSide = min(size.width, size.height).toFloat()
     val shader = RuntimeShader(RoundedRectRefractionShaderString).apply {
-        setFloatUniform("size", size.width.toFloat(), size.height.toFloat())
-        setFloatUniform("offset", -padding, -padding)
+        // `topOverhang` pushes the surface the lens bends along up out of sight while leaving its lower
+        // edge where it was. The rim that runs along the top edge then falls in the strip the band
+        // clips away, instead of bending the band's upper stretch — where the background has only just
+        // begun to show through, and a bend there reads as a kink rather than as glass.
+        setFloatUniform("size", size.width.toFloat(), size.height + topOverhang)
+        setFloatUniform("offset", -padding, -(padding - topOverhang))
         setFloatUniform("cornerRadii", cornerRadius, cornerRadius, cornerRadius, cornerRadius)
         setFloatUniform("rimHeight", min(RimHeightDp * density, shortSide * .34f).coerceAtLeast(1f))
         setFloatUniform("rimBend", min(RimBendDp * density, shortSide * .2f).coerceAtLeast(1f))
