@@ -56,6 +56,8 @@ object Metrics {
     val floatingElevation = 2.dp
     /** What a white sheet lifts off the grouped page by: a lift, not a drop shadow. */
     val cardElevation = 1.dp
+    /** A menu is opaque, so it needs a little more than the sheets to sit above them. */
+    val menuElevation = 4.dp
     const val switchScale = .7f
 
     // Strokes: hairline for floating glass edges, outline for flat panel/card borders.

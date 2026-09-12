@@ -79,7 +79,7 @@ private const val OVERVIEW_PAGES = 2001
 @Composable private fun CategoryCards(state: WorkspaceState, today: LocalDate, zone: ZoneId, dayStart: Int, open: (Long) -> Unit, openOverview: () -> Unit) {
     var parent by rememberSaveable { mutableStateOf<Long?>(null) }
     var sort by rememberSaveable { mutableIntStateOf(1) }
-    var sortDialog by remember { mutableStateOf(false) }
+    var sortMenu by remember { mutableStateOf(false) }
     val leaves = remember(state.categories) { state.categories.filter { category -> state.categories.none { it.parentId == category.id } } }
     val visible = when {
         parent == null -> leaves
@@ -108,7 +108,18 @@ private const val OVERVIEW_PAGES = 2001
                 }
             }
             IconButton(onClick = openOverview, Modifier.testTag("stats_overview")) { Icon(AppIcons.Chart, stringResource(R.string.share_overview), Modifier.size(Metrics.icon)) }
-            IconButton(onClick = { sortDialog = true }, Modifier.testTag("stats_sort")) { Icon(AppIcons.Sort, stringResource(R.string.sort), Modifier.size(Metrics.icon)) }
+            // Sorting is a menu under its own button instead of a dialog over the list it reorders.
+            Box {
+                IconButton(onClick = { sortMenu = true }, Modifier.testTag("stats_sort")) { Icon(AppIcons.Sort, stringResource(R.string.sort), Modifier.size(Metrics.icon)) }
+                DropdownMenu(expanded = sortMenu, onDismissRequest = { sortMenu = false }, shape = MaterialTheme.shapes.small,
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer, shadowElevation = Metrics.menuElevation) {
+                    val check: @Composable () -> Unit = { Icon(AppIcons.Check, null, Modifier.size(Metrics.icon)) }
+                    listOf(R.string.sort_category_order, R.string.sort_recent).forEachIndexed { index, label ->
+                        DropdownMenuItem(text = { Text(stringResource(label)) }, onClick = { sort = index; sortMenu = false },
+                            trailingIcon = if (sort == index) check else null, modifier = Modifier.testTag("sort_option_$index"))
+                    }
+                }
+            }
         }
         LazyColumn(Modifier.fillMaxSize().topFade().testTag("statistics_list"), contentPadding = PaddingValues(start = Space.md, end = Space.md, top = Space.sm, bottom = Metrics.dockClearance), verticalArrangement = Arrangement.spacedBy(Space.xs)) {
             items(ordered, key = { it.id }) { category ->
@@ -121,10 +132,6 @@ private const val OVERVIEW_PAGES = 2001
             }
             if (ordered.isEmpty()) item { ListEmpty(R.string.agenda_empty) }
         }
-    }
-    if (sortDialog) SelectionDialog(stringResource(R.string.sort), { sortDialog = false }) {
-        SelectionRow(stringResource(R.string.sort_category_order), sort == 0, { sort = 0; sortDialog = false })
-        SelectionRow(stringResource(R.string.sort_recent), sort == 1, { sort = 1; sortDialog = false })
     }
 }
 

@@ -53,8 +53,10 @@ class BrowseTest {
         compose.onNodeWithText("Planned reading").assertDoesNotExist()
         showsPlans = true
         compose.onNodeWithText("Planned reading").assertExists()
+        compose.onNodeWithTag("calendar_scale").performClick()
         compose.onNodeWithTag("calendar_scale_0").performClick()
         compose.onNodeWithTag("calendar_day").assertExists()
+        compose.onNodeWithTag("calendar_scale").performClick()
         compose.onNodeWithTag("calendar_scale_1").performClick()
         compose.onNodeWithTag("calendar_week").assertExists()
         compose.onNodeWithTag("browse_mode_2").performClick()

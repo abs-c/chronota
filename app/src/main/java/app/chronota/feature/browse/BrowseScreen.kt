@@ -254,6 +254,7 @@ fun ModeTabs(labels: List<Int>, selected: Int, select: (Int) -> Unit, tag: Strin
         previousStart = dayStart
     }
     var picker by remember { mutableStateOf(false) }
+    var scaleMenu by remember { mutableStateOf(false) }
     val locale = LocalResources.current.configuration.locales[0]
     val zone = ZoneId.systemDefault()
     // Whether this calendar also draws plans is its own setting; the records always belong here.
@@ -276,16 +277,31 @@ fun ModeTabs(labels: List<Int>, selected: Int, select: (Int) -> Unit, tag: Strin
         // timer itself, and listing it in both places would show the same entry in two lanes.
         state.copy(plans = if (showPlans) state.plans else emptyList())
     }
-    ModeTabs(listOf(R.string.day, R.string.week, R.string.month), scale, { scale = it }, "calendar_scale")
     Row(Modifier.fillMaxWidth().padding(horizontal = Space.md), verticalAlignment = Alignment.CenterVertically) {
-        IconButton(onClick = { date = when (scale) { 0 -> date.minusDays(1); 1 -> date.minusWeeks(1); else -> date.minusMonths(1) } }) { Icon(AppIcons.Back, stringResource(R.string.previous_period), Modifier.size(Metrics.icon)) }
         // The title is its own rounded touch target, so a press reads as a control rather than a band
-        // of shadow the width of the row.
+        // of shadow the width of the row. There are no arrows beside it: every scale turns under a
+        // horizontal swipe, and a press opens the date picker for anywhere the swipe cannot reach.
         Row(Modifier.weight(1f).height(Metrics.touchTarget).padding(horizontal = Space.xs).clip(MaterialTheme.shapes.small).clickable { picker = true }, verticalAlignment = Alignment.CenterVertically) {
-            Text(if (scale == 0) dateText(date) else date.format(DateTimeFormatter.ofPattern(if (locale.language == "zh") "yyyy 年 M 月" else "MMMM yyyy", locale)), style = MaterialTheme.typography.titleMedium)
+            Text(if (scale == 0) dateText(date) else date.format(DateTimeFormatter.ofPattern(if (locale.language == "zh") "yyyy 年 M 月" else "MMMM yyyy", locale)),
+                style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
         TextButton(onClick = { date = logicalDate(now, dayStartMinutes = dayStart) }) { Text(stringResource(R.string.today)) }
-        IconButton(onClick = { date = when (scale) { 0 -> date.plusDays(1); 1 -> date.plusWeeks(1); else -> date.plusMonths(1) } }) { Icon(AppIcons.Next, stringResource(R.string.next_period), Modifier.size(Metrics.icon)) }
+        // The scale is a menu at the end of the row rather than a bar of its own.
+        Box {
+            Row(Modifier.height(Metrics.touchTarget).clip(MaterialTheme.shapes.small).clickable { scaleMenu = true }.testTag("calendar_scale")
+                .padding(horizontal = Space.xs), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Space.xxs)) {
+                Text(stringResource(when (scale) { 0 -> R.string.day; 1 -> R.string.week; else -> R.string.month }), style = MaterialTheme.typography.labelLarge, maxLines = 1)
+                Icon(AppIcons.Down, null, Modifier.size(Metrics.iconSmall), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            DropdownMenu(expanded = scaleMenu, onDismissRequest = { scaleMenu = false }, shape = MaterialTheme.shapes.small,
+                containerColor = MaterialTheme.colorScheme.surfaceContainer, shadowElevation = Metrics.menuElevation) {
+                val check: @Composable () -> Unit = { Icon(AppIcons.Check, null, Modifier.size(Metrics.icon)) }
+                listOf(R.string.day, R.string.week, R.string.month).forEachIndexed { index, label ->
+                    DropdownMenuItem(text = { Text(stringResource(label)) }, onClick = { scale = index; scaleMenu = false },
+                        trailingIcon = if (scale == index) check else null, modifier = Modifier.testTag("calendar_scale_$index"))
+                }
+            }
+        }
     }
     when (scale) {
         0 -> Box(Modifier.fillMaxSize().cardSurface(SheetShape).testTag("calendar_day")) {

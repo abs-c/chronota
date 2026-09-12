@@ -53,8 +53,9 @@ class TimelineSqueezeTest {
         // 09:00 for one minute, then 09:12: twelve minutes of room, above the ten-minute floor.
         compose.setContent { ChronotaTheme(false) { BrowseScreen(true, state(LocalTime.of(9, 0) to LocalTime.of(9, 1), LocalTime.of(9, 12) to LocalTime.of(9, 13)), {}, {}, {}) } }
         compose.onNodeWithTag("browse_mode_1").performClick()
+        compose.onNodeWithTag("calendar_scale").performClick()
         compose.onNodeWithTag("calendar_scale_1").performClick()
-        compose.onNodeWithContentDescription("Next period").performClick()
+        compose.onNodeWithTag("calendar_week").performTouchInput { swipeLeft() }
         val blocks = blockRects().sortedBy { it.top }
         assertEquals(2, blocks.size)
         // Squeezed block: twelve minutes of room, not the twenty-minute minimum.
@@ -68,8 +69,9 @@ class TimelineSqueezeTest {
         // 09:00-09:05 and 09:05-09:20: the next starts exactly when this one ends.
         compose.setContent { ChronotaTheme(false) { BrowseScreen(true, state(LocalTime.of(9, 0) to LocalTime.of(9, 5), LocalTime.of(9, 5) to LocalTime.of(9, 20)), {}, {}, {}) } }
         compose.onNodeWithTag("browse_mode_1").performClick()
+        compose.onNodeWithTag("calendar_scale").performClick()
         compose.onNodeWithTag("calendar_scale_1").performClick()
-        compose.onNodeWithContentDescription("Next period").performClick()
+        compose.onNodeWithTag("calendar_week").performTouchInput { swipeLeft() }
         val blocks = blockRects().sortedBy { it.top }
         assertEquals(2, blocks.size)
         // They share a lane — stacked, never side by side — and the front one still gets the floor.
@@ -83,8 +85,9 @@ class TimelineSqueezeTest {
         // 09:00-09:10 and 09:05-09:15 really do overlap, so they take a lane each.
         compose.setContent { ChronotaTheme(false) { BrowseScreen(true, state(LocalTime.of(9, 0) to LocalTime.of(9, 10), LocalTime.of(9, 5) to LocalTime.of(9, 15)), {}, {}, {}) } }
         compose.onNodeWithTag("browse_mode_1").performClick()
+        compose.onNodeWithTag("calendar_scale").performClick()
         compose.onNodeWithTag("calendar_scale_1").performClick()
-        compose.onNodeWithContentDescription("Next period").performClick()
+        compose.onNodeWithTag("calendar_week").performTouchInput { swipeLeft() }
         val blocks = blockRects().sortedBy { it.left }
         assertEquals(2, blocks.size)
         assertTrue(blocks[1].left > blocks[0].right - 1f)
@@ -97,8 +100,9 @@ class TimelineSqueezeTest {
             LocalTime.of(9, 0, 0) to LocalTime.of(9, 5, 12),
             LocalTime.of(9, 5, 0) to LocalTime.of(9, 20)), {}, {}, {}) } }
         compose.onNodeWithTag("browse_mode_1").performClick()
+        compose.onNodeWithTag("calendar_scale").performClick()
         compose.onNodeWithTag("calendar_scale_1").performClick()
-        compose.onNodeWithContentDescription("Next period").performClick()
+        compose.onNodeWithTag("calendar_week").performTouchInput { swipeLeft() }
         val blocks = blockRects().sortedBy { it.top }
         assertEquals(2, blocks.size)
         assertEquals("seconds must not become a second column", blocks[0].left, blocks[1].left, 1f)
@@ -111,8 +115,9 @@ class TimelineSqueezeTest {
             LocalTime.of(9, 0, 0) to LocalTime.of(9, 6, 12),
             LocalTime.of(9, 5, 0) to LocalTime.of(9, 20)), {}, {}, {}) } }
         compose.onNodeWithTag("browse_mode_1").performClick()
+        compose.onNodeWithTag("calendar_scale").performClick()
         compose.onNodeWithTag("calendar_scale_1").performClick()
-        compose.onNodeWithContentDescription("Next period").performClick()
+        compose.onNodeWithTag("calendar_week").performTouchInput { swipeLeft() }
         val blocks = blockRects().sortedBy { it.left }
         assertEquals(2, blocks.size)
         assertTrue(blocks[1].left > blocks[0].right - 1f)
