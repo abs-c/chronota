@@ -68,8 +68,17 @@ fun GlassDock(route: String, navigate: (String) -> Unit, timer: TimerSession?, d
         label = "dockLight",
     )
     Row(Modifier.fillMaxWidth().padding(horizontal = Space.md, vertical = Space.lg), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(Space.sm)) {
+        val density = LocalDensity.current
+        var dockWidth by remember { mutableStateOf(0) }
+        // Where the light is, in the dock's own coordinates, worked out before the drawing so the rim
+        // can be given the same place: the pane's pool and the rim's light have to agree, or the edge
+        // reads as a separate, fixed highlight left over from another light.
+        val insetPx = with(density) { Space.xxs.toPx() }
+        val itemPx = if (dockWidth > 0) (dockWidth - insetPx * 2) / Destination.entries.size else 0f
+        val lightCentre = if (itemPx > 0f) Offset(insetPx + (light + .5f) * itemPx, with(density) { Metrics.dockHeight.toPx() } / 2f) else null
         Box(Modifier.weight(1f).requiredHeight(Metrics.dockHeight).testTag("glass_dock")
             .graphicsLayer { alpha = if (wheelOpen) 0f else 1f }
+            .onSizeChanged { dockWidth = it.width }
             .clip(CircleShape)
             // One step off the paper, whichever paper it is: `surfaceContainerHigh` is a shade darker
             // than the sheet in the light and a shade lighter than it in the dark, so the pane has a
@@ -82,9 +91,8 @@ fun GlassDock(route: String, navigate: (String) -> Unit, timer: TimerSession?, d
                 // of that item to both sides and slides along when you change pages. Everything else on
                 // the dock is material — the body, the rim — so there is no second light to disagree
                 // with this one.
-                val inset = Space.xxs.toPx()
-                val item = (size.width - inset * 2) / Destination.entries.size
-                val centre = Offset(inset + (light + .5f) * item, size.height * .5f)
+                val centre = lightCentre ?: return@drawWithContent
+                val item = itemPx
                 val lit = lighting.light
                 drawRect(Brush.radialGradient(
                     listOf(Color.White.copy(alpha = .14f * lit), Color.White.copy(alpha = .04f * lit), Color.Transparent),
@@ -100,7 +108,7 @@ fun GlassDock(route: String, navigate: (String) -> Unit, timer: TimerSession?, d
                     radius = item * 2.6f,
                 ))
             }
-            .glassRing()) {
+            .glassRing(lightCentre = lightCentre, lightReach = itemPx * 2.2f)) {
             Row(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface.copy(alpha = .08f)).padding(Space.xxs).selectableGroup()) {
                 routes.forEachIndexed { index, destination ->
                     val selected = route == destination

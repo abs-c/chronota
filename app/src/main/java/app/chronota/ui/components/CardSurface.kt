@@ -53,7 +53,21 @@ private val SheetShadow = Color.Black.copy(alpha = .07f)
  * right, where the silhouette takes over — glass is not lit from everywhere, and an evenly lit ring
  * reads as plastic.
  */
-@Composable fun Modifier.glassRing(stroke: Dp = Metrics.outline, shape: Shape = CircleShape): Modifier {
+/**
+ * The edge of a piece of glass, in three passes: a soft band of thickness, a crisp specular on its
+ * inner side, and a whisper of the page's separator outside it.
+ *
+ * Where the light comes from is up to the surface. Left to itself it is the corner — the shape's
+ * projection onto 45°, so a wide bar is not lit sideways — but a surface whose own light has a place
+ * (the dock's, which gathers over the page you are on) passes that place in, and then the same three
+ * passes run as rings around it: brightest closest to the light, spent on the far side.
+ */
+@Composable fun Modifier.glassRing(
+    stroke: Dp = Metrics.outline,
+    shape: Shape = CircleShape,
+    lightCentre: Offset? = null,
+    lightReach: Float = 0f,
+): Modifier {
     val separator = MaterialTheme.colorScheme.outlineVariant
     val lighting = glassLighting()
     val layoutDirection = LocalLayoutDirection.current
@@ -65,13 +79,21 @@ private val SheetShadow = Color.Black.copy(alpha = .07f)
             is Outline.Generic -> outline.path
         }
         val line = stroke.toPx()
-        val lit = Brush.linearGradient(
-            listOf(Color.White.copy(alpha = .5f * lighting.light), Color.White.copy(alpha = .18f * lighting.light), Color.White.copy(alpha = .04f * lighting.light)),
-            start = Offset(0f, 0f),
-            end = Offset(size.width * .82f, size.height),
+        val litColors = listOf(
+            Color.White.copy(alpha = .5f * lighting.light),
+            Color.White.copy(alpha = .18f * lighting.light),
+            Color.White.copy(alpha = .04f * lighting.light),
         )
+        val lit = if (lightCentre != null) Brush.radialGradient(litColors, center = lightCentre, radius = lightReach.coerceAtLeast(1f))
+        else diagonalLight(size, litColors)
         drawPath(edge, brush = lit, alpha = .08f * lighting.light, style = Stroke(line * 3f))
         drawPath(edge, brush = lit, style = Stroke(line))
-        drawPath(edge, brush = Brush.linearGradient(listOf(Color.Transparent, Color.Transparent, separator.copy(alpha = .34f))), style = Stroke(line))
+        val shade = listOf(Color.Transparent, Color.Transparent, separator.copy(alpha = .34f * lighting.shade))
+        drawPath(
+            edge,
+            brush = if (lightCentre != null) Brush.radialGradient(shade, center = lightCentre, radius = (lightReach * 1.4f).coerceAtLeast(1f))
+            else diagonalLight(size, shade),
+            style = Stroke(line),
+        )
     }
 }
