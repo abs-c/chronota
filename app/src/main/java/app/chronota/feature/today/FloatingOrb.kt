@@ -94,19 +94,15 @@ fun FloatingOrb(timer: TimerSession?, defaultAction: OrbAction, onAction: (OrbAc
         // No panel behind the elapsed time: it reads straight on the page.
         if (timer != null && !expanded) Text(timerElapsedText(timer.elapsed(now)),
             Modifier.align(Alignment.TopEnd).offset(y = -Metrics.orb / 2), style = MaterialTheme.typography.labelMedium)
-        val stain = MaterialTheme.colorScheme.primary
-        Box(Modifier.size(Metrics.orb).graphicsLayer { scaleX = pressScale; scaleY = pressScale }.shadow(1.dp, CircleShape, ambientColor = Color.Black.copy(alpha = .03f), spotColor = Color.Black.copy(alpha = .04f)).clip(CircleShape)
-            // Ordinary glass — the same material as the dock — with the theme colour washed over it
-            // at a low opacity, and one highlight where the light lands. Nothing else: every extra
-            // layer over the tint is another layer that can bleach the colour out of it.
-            .glassSurface(backdrop, backdropOrigin, stain, tintAlpha = .15f)
+        // The dock's own material, nothing added: the same glass, the same wash of the surface colour,
+        // the same light falling on it and the same rim. No colour of its own — what tells it apart is
+        // its shape and the icon on it.
+        Box(Modifier.size(Metrics.orb).graphicsLayer { scaleX = pressScale; scaleY = pressScale }.clip(CircleShape)
+            .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.surface, tintAlpha = .05f)
             .drawWithContent {
                 drawContent()
-                drawCircle(brush = Brush.radialGradient(
-                    listOf(Color.White.copy(alpha = .2f), Color.White.copy(alpha = .03f), Color.Transparent),
-                    center = Offset(size.width * .32f, size.height * .26f),
-                    radius = size.minDimension * .4f,
-                ))
+                drawRect(Brush.verticalGradient(listOf(Color.White.copy(alpha = .18f), Color.Transparent), endY = size.height * .58f))
+                drawRect(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = .025f)), startY = size.height * .75f))
             }
             .glassRing()
             .semantics { contentDescription = description; role = Role.Button; onClick { tap(); true }; onLongClick { expanded = true; true } }

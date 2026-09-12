@@ -68,7 +68,7 @@ fun GlassDock(route: String, navigate: (String) -> Unit, timer: TimerSession?, d
                 drawContent()
                 // The light falling on the top of the glass, and the shade gathering at its bottom.
                 drawRect(Brush.verticalGradient(listOf(Color.White.copy(alpha = .18f), Color.Transparent), endY = size.height * .58f))
-                drawRect(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = .05f)), startY = size.height * .62f))
+                drawRect(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = .025f)), startY = size.height * .75f))
             }
             .glassRing()) {
             Row(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface.copy(alpha = .08f)).padding(Space.xxs).selectableGroup()) {
