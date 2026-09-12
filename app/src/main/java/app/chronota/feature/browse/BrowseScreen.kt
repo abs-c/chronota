@@ -333,7 +333,7 @@ fun ModeTabs(labels: List<Int>, selected: Int, select: (Int) -> Unit, tag: Strin
                     },
                     body = {
                         WeekAllDayRow(date, entries, state, weekSwipe) { if (it.isPlan) onPlan(it.id) else onRecord(it.id) }
-                        Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(top = Space.sm).padding(bottom = Metrics.dockClearance)) {
+                        Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(top = LocalBandHead.current).padding(bottom = Metrics.dockClearance)) {
                             WeekGridBody(date, entries, state, weekSwipe) { if (it.isPlan) onPlan(it.id) else onRecord(it.id) }
                         }
                     })

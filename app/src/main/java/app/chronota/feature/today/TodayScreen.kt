@@ -128,7 +128,7 @@ fun TodayScreen(onSettings: () -> Unit, state: WorkspaceState = WorkspaceState()
         Box(Modifier.weight(1f)) {
             // The schedule starts flush with the band's lower edge: no spacer and no top padding, or the page
             // shows a strip of bare white between the band's grey and the first hour line.
-            Box(Modifier.fillMaxSize().verticalScroll(scroll).padding(horizontal = Space.md).padding(bottom = Metrics.dockClearance)) {
+            Box(Modifier.fillMaxSize().verticalScroll(scroll).padding(horizontal = Space.md).padding(top = LocalBandHead.current).padding(bottom = Metrics.dockClearance)) {
                 Box(Modifier.fillMaxWidth().height(height)) {
                     val hours = (day.millis / 3_600_000).toInt()
                     repeat(hours + 1) { hour ->

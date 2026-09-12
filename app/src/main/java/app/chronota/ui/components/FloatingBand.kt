@@ -71,7 +71,10 @@ fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() 
             val bodyFrom = if (BandGlassEnabled && BandTint < 1f) SolidFraction else 1f
             Column(Modifier.fillMaxSize().sheetSurface()) {
                 Spacer(Modifier.height(with(density) { (bandPx * bodyFrom).toDp() }))
-                body()
+                // A scroll inside is told how much of the band it begins under, so it can rest its first
+                // row at the band's lower edge rather than up at the glass line — and so that the stretch
+                // above that row, which is the blank before the day starts, is what sits under the glass.
+                CompositionLocalProvider(LocalBandHead provides with(density) { (bandPx * (1f - bodyFrom)).toDp() } + Metrics.hairline) { body() }
             }
         }
         // The band is its own content.
@@ -137,3 +140,14 @@ fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() 
         drawContent()
     }
 }
+
+/**
+ * The stretch of the band from the line its glass begins at down to its lower edge — the part of the
+ * page that is still band, and where the day has not started yet.
+ *
+ * A timeline's scroll starts below it: with this as the top padding of the scrolled content, resting
+ * at the top of the scroll puts the first hour exactly at the band's lower edge, and the stretch above
+ * it, up under the glass, is the blank before the day began. Scrolling on carries the day up through
+ * the glass, which is what the band is for.
+ */
+val LocalBandHead = compositionLocalOf { 0.dp }
