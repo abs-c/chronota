@@ -158,11 +158,18 @@ private object BodySlot
                     endY = end,
                 )
             )
-            // The same body the dock carries, at half the strength: one step off the page, so the
-            // band's glass has a tone of its own instead of being only the page's grey fading out.
-            drawRect(body.copy(alpha = .12f))
-            // And one light on it, from the corner, along the same 45° axis as every other piece.
-            drawRect(diagonalLight(size, listOf(Color.White.copy(alpha = lighting.wash * .25f), Color.Transparent)))
+            // The glass's own body — one step off the page, so it has a tone rather than being only the
+            // page's grey fading out — fades in with the glass. Drawn flat it would sit on the solid
+            // header too, and a body colour is a wash: on a dark page that is a nine-level lift across
+            // the whole band, which is enough to squeeze the ramp and leave the header at #090909
+            // instead of the page's black. Anything that belongs to the glass has to arrive with it.
+            drawRect(
+                Brush.verticalGradient(
+                    0f to Color.Transparent,
+                    SolidFraction to Color.Transparent,
+                    1f to body.copy(alpha = .12f),
+                )
+            )
         }
         drawContent()
     }
