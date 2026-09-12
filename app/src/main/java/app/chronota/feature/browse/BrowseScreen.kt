@@ -288,23 +288,25 @@ fun ModeTabs(labels: List<Int>, selected: Int, select: (Int) -> Unit, tag: Strin
         IconButton(onClick = { date = when (scale) { 0 -> date.plusDays(1); 1 -> date.plusWeeks(1); else -> date.plusMonths(1) } }) { Icon(AppIcons.Next, stringResource(R.string.next_period), Modifier.size(Metrics.icon)) }
     }
     when (scale) {
-        0 -> Box(Modifier.fillMaxSize().padding(top = Space.xs).cardSurface(SheetShape).testTag("calendar_day")) {
+        0 -> Box(Modifier.fillMaxSize().cardSurface(SheetShape).testTag("calendar_day")) {
             TodayScreen({}, dayState, onPlan = { id, _ -> if (id != 0L) onPlan(id) else add(date) }, onRecord = { id, _ -> if (id != 0L) onRecord(id) else add(date) },
                 onCreatePlan = createPlan, onCreateRecord = createRecord, calendarCutoff = now, selectedDate = date, showHeader = false, showPlans = showPlans, showRecords = true, singleColumn = true)
         }
-        1 -> Column(Modifier.fillMaxSize().padding(top = Space.xs).cardSurface(SheetShape).testTag("calendar_week")) {
+        1 -> Column(Modifier.fillMaxSize().testTag("calendar_week")) {
             // The weekday names are a fixed header. Below them a swipe anywhere turns the week, and
             // the dates and the blocks slide with it while the hour gutter on the left stays put, so
             // the numbers a swipe is read against never move.
             val weekSwipe = rememberSwipeController()
             Column(Modifier.fillMaxSize().swipeGestures(weekSwipe, { date = date.minusWeeks(1) }, { date = date.plusWeeks(1) })) {
-                // The date row and the all-day chips sit above the grid, so which week is on screen
-                // stays readable while the hours scroll underneath.
+                // The weekday names and the dates stay on the grouped page, and the sheet starts under
+                // them with the all-day row, so the color changes below the dates rather than above.
                 WeekGridHeader(date)
                 WeekDateRow(date, weekSwipe) { date = it; scale = 0 }
-                WeekAllDayRow(date, entries, state, weekSwipe) { if (it.isPlan) onPlan(it.id) else onRecord(it.id) }
-                Column(Modifier.weight(1f).topFade().verticalScroll(rememberScrollState()).padding(top = Space.sm).padding(bottom = Metrics.dockClearance)) {
-                    WeekGridBody(date, entries, state, weekSwipe) { if (it.isPlan) onPlan(it.id) else onRecord(it.id) }
+                Column(Modifier.weight(1f).cardSurface(SheetShape)) {
+                    WeekAllDayRow(date, entries, state, weekSwipe) { if (it.isPlan) onPlan(it.id) else onRecord(it.id) }
+                    Column(Modifier.weight(1f).topFade().verticalScroll(rememberScrollState()).padding(top = Space.sm).padding(bottom = Metrics.dockClearance)) {
+                        WeekGridBody(date, entries, state, weekSwipe) { if (it.isPlan) onPlan(it.id) else onRecord(it.id) }
+                    }
                 }
             }
         }

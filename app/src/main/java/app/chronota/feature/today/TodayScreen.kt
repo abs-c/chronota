@@ -87,7 +87,9 @@ fun TodayScreen(onSettings: () -> Unit, state: WorkspaceState = WorkspaceState()
     // background itself instead of sitting on the grouped gray. Only the header band is separated,
     // by a hairline rather than by a change of color.
     PageColumn(Modifier.background(MaterialTheme.colorScheme.surface)) {
-        if (showHeader) {
+        // The date band keeps the grouped background while the schedule below it is plain paper, so the
+        // page changes color under the dates instead of cutting through them.
+        if (showHeader) Column(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.background)) {
         val locale = androidx.compose.ui.platform.LocalResources.current.configuration.locales[0]
         val monthPattern = if (locale.language == "zh") "yyyy 年 M 月" else "MMMM yyyy"
         Row(Modifier.fillMaxWidth().padding(start = Space.md, top = Space.xxs, end = Space.md), verticalAlignment = Alignment.CenterVertically) {
@@ -150,7 +152,6 @@ fun TodayScreen(onSettings: () -> Unit, state: WorkspaceState = WorkspaceState()
             if (showRecords && !singleColumn) Spacer(Modifier.weight(1f))
         }
         Spacer(Modifier.height(Space.xs))
-        if (showHeader) HorizontalDivider(Modifier.padding(top = Space.xs), color = MaterialTheme.colorScheme.outlineVariant)
         Box(Modifier.weight(1f)) {
             Box(Modifier.fillMaxSize().topFade().verticalScroll(scroll).padding(horizontal = Space.md).padding(top = Space.sm).padding(bottom = Metrics.dockClearance)) {
                 Box(Modifier.fillMaxWidth().height(height)) {
