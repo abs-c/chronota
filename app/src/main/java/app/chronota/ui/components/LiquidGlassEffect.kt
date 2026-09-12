@@ -26,17 +26,19 @@ internal fun liquidGlassEffect(size: IntSize, padding: Float, density: Float, co
         setFloatUniform("size", size.width.toFloat(), size.height.toFloat())
         setFloatUniform("offset", -padding, -padding)
         setFloatUniform("cornerRadii", cornerRadius, cornerRadius, cornerRadius, cornerRadius)
-        setFloatUniform("rimHeight", min(RimHeightDp * density, shortSide * .3f).coerceAtLeast(1f))
-        setFloatUniform("rimBend", min(RimBendDp * density, shortSide * .22f).coerceAtLeast(1f))
-        setFloatUniform("depthEffect", .12f)
+        setFloatUniform("rimHeight", min(RimHeightDp * density, shortSide * .34f).coerceAtLeast(1f))
+        setFloatUniform("rimBend", min(RimBendDp * density, shortSide * .2f).coerceAtLeast(1f))
+        setFloatUniform("depthEffect", .18f)
     }
     val lens = RenderEffect.createRuntimeShaderEffect(shader, "content")
     val blur = RenderEffect.createBlurEffect(FrostRadiusDp * density, FrostRadiusDp * density, Shader.TileMode.CLAMP)
+    // The blur runs first and the lens bends the soft image, so the fold the rim profile makes at the
+    // very edge reads as the thickness of the glass instead of a crease in it.
     return RenderEffect.createChainEffect(lens, blur).asComposeRenderEffect()
 }
 
 /** How deep into the surface the rim's bend reaches. */
-private const val RimHeightDp = 11f
+private const val RimHeightDp = 22f
 
 /** How far the backdrop is pulled in at the very edge. */
-private const val RimBendDp = 7f
+private const val RimBendDp = 13f

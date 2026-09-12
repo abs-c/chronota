@@ -103,13 +103,9 @@ fun TodayScreen(onSettings: () -> Unit, state: WorkspaceState = WorkspaceState()
                 if (weekView) WeekStrip(date, preferences.weekStart, { date = it }, { date = date.minusWeeks(1) }, { date = date.plusWeeks(1) })
             }
         }
-        // The body is the bottom layer: the white sheet with the lane labels, the all-day chips and the
-        // hours. On the calendar's day view it is drawn by the calendar, which owns the band there.
+        // The body is the bottom layer: the white sheet with the all-day chips and the hours. On the
+        // calendar's day view it is drawn by the calendar, which owns the band there.
         val schedule: @Composable ColumnScope.() -> Unit = {
-        if (!singleColumn) Row(Modifier.fillMaxWidth().padding(vertical = Space.xxs)) {
-            if (showPlans) Box(Modifier.weight(1f).padding(start = Metrics.timelineGutter)) { Text(stringResource(R.string.plan), style = MaterialTheme.typography.labelMedium) }
-            if (showRecords) Box(Modifier.weight(1f).padding(start = if (showPlans) Space.xs else Metrics.timelineGutter)) { Text(stringResource(R.string.record), style = MaterialTheme.typography.labelMedium) }
-        }
         val dayPlans = remember(state.plans, date, dayStart) {
             // The next calendar date is in scope: a late day start pulls its small hours into this day.
             state.plans.flatMap { plan -> plan.expandOccurrences(date.minusDays(1), date.plusDays(1)) }

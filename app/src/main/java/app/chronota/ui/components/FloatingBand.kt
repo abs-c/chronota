@@ -1,5 +1,6 @@
 package app.chronota.ui.components
 
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
@@ -20,6 +21,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
+
+/** How far above the band's lower edge the sheet begins, inside the rim the lens bends. */
+private const val SheetEdgeDp = 9f
 
 /**
  * A page with a date band across its top and the page's own body under it.
@@ -42,9 +46,10 @@ fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() 
     var origin by remember { mutableStateOf(Offset.Zero) }
     var bandPx by remember { mutableStateOf(0) }
     val density = LocalDensity.current
-    // The sheet starts this far above the band's lower edge, leaving the frost room to reach white
-    // before the band ends; starting it exactly at the edge would leave a step where they meet.
-    val blend = with(density) { (FrostRadiusDp * 1.5f).dp }
+    // The sheet begins this far above the band's lower edge, inside the rim the lens bends — that
+    // boundary is what the band's glass has to refract. Put it below the rim and the band's edge has
+    // nothing but one flat grey to magnify, which is why a band with no refraction looks painted on.
+    val blend = with(density) { SheetEdgeDp.dp }
     Box(Modifier.fillMaxSize()) {
         Box(Modifier.fillMaxSize()
             .onGloballyPositioned { origin = it.positionInRoot() }
@@ -64,20 +69,28 @@ fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() 
 }
 
 /**
- * The frost of the band: the page's gray above, the sheet's white below, and the blurred boundary
- * between them carrying one into the other. Nothing is painted over it — the material is the blur.
+ * The glass of the band: the page's gray above, the sheet's white below, and the lens along the
+ * band's lower edge magnifying the boundary between them. Nothing is painted over it — the material
+ * is the frost and the bend.
  *
- * The lens is padded so its blur is not clamped at the rim; the band clips it (`clipToBounds`), or
- * the frost would reach over the sheet's first row and blur the lane labels under it.
+ * The lens layer is padded so the frost is not clamped at its rim; the band clips the result
+ * (`clipToBounds`), or the glass would reach over the sheet's first row and bend what is on it.
  */
 @Composable fun Modifier.glassBand(backdrop: GraphicsLayer, backdropOrigin: Offset): Modifier {
     val lens = rememberGraphicsLayer()
     val density = LocalDensity.current.density
     val padding = FrostPaddingDp * density
+    var bounds by remember { mutableStateOf(IntSize.Zero) }
     var origin by remember { mutableStateOf(Offset.Zero) }
-    val effect = remember(density) { frostEffect(density) }
+    val effect = remember(bounds, density) {
+        // A radius of 0 makes the lens's normal degenerate along the band's flat edges: the shader
+        // normalises an empty vector there and the bend comes out as nothing at all. A hair of a
+        // radius keeps it well defined, and the band's own corners are off the sides of the screen.
+        if (Build.VERSION.SDK_INT >= 33 && bounds.width > 0 && bounds.height > 0) liquidGlassEffect(bounds, padding, density, 2f * density)
+        else frostEffect(density)
+    }
     SideEffect { lens.renderEffect = effect }
-    return onGloballyPositioned { origin = it.positionInRoot() }.drawWithContent {
+    return onSizeChanged { bounds = it }.onGloballyPositioned { origin = it.positionInRoot() }.drawWithContent {
         if (effect != null) {
             val offset = origin - backdropOrigin
             lens.record(size = IntSize((size.width + 2 * padding).roundToInt(), (size.height + 2 * padding).roundToInt())) {

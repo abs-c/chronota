@@ -69,6 +69,11 @@ uniform float depthEffect;
 
 $RoundedRectSDF
 
+// Flat where the surface is flat, the whole of the bend at the outline.
+float circleMap(float x) {
+    return 1.0 - sqrt(max(0.0, 1.0 - x * x));
+}
+
 half4 main(float2 coord) {
     float2 local = coord + offset;
     float2 halfSize = size * 0.5;
@@ -79,8 +84,8 @@ half4 main(float2 coord) {
     if (sd <= -rimHeight) {
         return content.eval(coord);
     }
-    float t = clamp(-sd / rimHeight, 0.0, 1.0);
-    float bend = (1.0 - sqrt(max(0.0, 1.0 - t * t))) * -rimBend;
+    float outward = 1.0 - clamp(-sd / rimHeight, 0.0, 1.0);
+    float bend = circleMap(outward) * -rimBend;
 
     float gradRadius = min(radius * 1.5, min(halfSize.x, halfSize.y));
     float2 grad = normalize(gradSdRoundedRect(centered, halfSize, gradRadius) + depthEffect * normalize(centered + 0.0001));
