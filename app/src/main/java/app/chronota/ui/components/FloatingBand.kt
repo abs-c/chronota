@@ -68,6 +68,8 @@ private const val BandTint = .3f
 fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() -> Unit) {
     val layer = rememberGraphicsLayer()
     val density = LocalDensity.current
+    val solidLine = remember { mutableFloatStateOf(Float.NaN) }
+    val reportSolidLine = remember { { y: Float -> solidLine.floatValue = y } }
     // One measurement for both: the band is measured first, so the body can be laid out and the glass
     // drawn against a height that is already real. The alternative — measure, hold the height in state,
     // recompose — draws one frame where the height is still zero, and a gradient over zero pixels is
@@ -75,8 +77,11 @@ fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() 
     // floor colour. That frame is what a screenshot catches and what the eye catches on the way in.
     SubcomposeLayout { constraints ->
         var origin = Offset.Zero
+        val solidRoot = solidLine.floatValue
         val bandPlaceable = subcompose(BandSlot) {
-            Box(Modifier.fillMaxWidth().onGloballyPositioned { origin = it.positionInRoot() }.clipToBounds().glassBand(layer, origin)) { band() }
+            CompositionLocalProvider(LocalBandSolidLine provides reportSolidLine) {
+                Box(Modifier.fillMaxWidth().onGloballyPositioned { origin = it.positionInRoot() }.clipToBounds().glassBand(layer, origin, solidRoot)) { band() }
+            }
         }.first().measure(constraints.copy(minHeight = 0))
         val bandPx = bandPlaceable.height
         val bodyFrom = if (BandGlassEnabled && BandTint < 1f) SolidFraction else 1f
@@ -105,8 +110,13 @@ private object BodySlot
 /**
  * The band: flat grey across its content, and — once the glass is on — the lens over it with the grey
  * giving way towards the bottom, and an edge where it meets the sheet.
+ *
+ * [solidRoot] is where the day names stand, in root coordinates, reported by the band's own content.
+ * The opaque part has to end there in every view, and the views do not share a band height: today
+ * carries a title above the week, the day view has no title at all. A fraction of the height would
+ * put the line in three different places; the letters are the one landmark all three have.
  */
-@Composable fun Modifier.glassBand(backdrop: GraphicsLayer, backdropOrigin: Offset): Modifier {
+@Composable fun Modifier.glassBand(backdrop: GraphicsLayer, backdropOrigin: Offset, solidRoot: Float): Modifier {
     val lens = rememberGraphicsLayer()
     val density = LocalDensity.current.density
     val padding = FrostPaddingDp * density
@@ -141,16 +151,20 @@ private object BodySlot
             // slope with no change of value, and the eye draws that corner as a line across the band.
             // On a dark page the ramp has twice as far to fall, so the same corner is twice as loud.
             val end = size.height.coerceAtLeast(1f)
+            // The letters' line when the band's content has reported it, the old fraction until then.
+            val solid = if (solidRoot.isNaN()) size.height * SolidFraction else (solidRoot - origin.y).coerceIn(0f, size.height)
+            val span = (size.height - solid).coerceAtLeast(1f)
+            fun stop(t: Float) = (solid + span * t) / end
             drawRect(
                 Brush.verticalGradient(
                     0f to base,
-                    SolidFraction to base,
-                    .405f to base.copy(alpha = bandAlpha(.0608f)),
-                    .51f to base.copy(alpha = bandAlpha(.216f)),
-                    .615f to base.copy(alpha = bandAlpha(.4252f)),
-                    .685f to base.copy(alpha = bandAlpha(.5757f)),
-                    .79f to base.copy(alpha = bandAlpha(.7840f)),
-                    .895f to base.copy(alpha = bandAlpha(.9392f)),
+                    (solid / end).coerceIn(0f, 1f) to base,
+                    stop(.15f) to base.copy(alpha = bandAlpha(.0608f)),
+                    stop(.30f) to base.copy(alpha = bandAlpha(.216f)),
+                    stop(.45f) to base.copy(alpha = bandAlpha(.4252f)),
+                    stop(.55f) to base.copy(alpha = bandAlpha(.5757f)),
+                    stop(.70f) to base.copy(alpha = bandAlpha(.7840f)),
+                    stop(.85f) to base.copy(alpha = bandAlpha(.9392f)),
                     1f to base.copy(alpha = bandAlpha(1f)),
                     startY = 0f,
                     endY = end,
@@ -171,3 +185,16 @@ private object BodySlot
  * the glass, which is what the band is for.
  */
 val LocalBandHead = compositionLocalOf { 0.dp }
+
+/**
+ * Where the band's opaque grey ends, reported by the band's own content: the day-name row says where
+ * its bottom sits, and the band takes that as the line it stops being solid at. Content, not a
+ * fraction of whatever height the band happens to be.
+ */
+val LocalBandSolidLine = compositionLocalOf<(Float) -> Unit> { {} }
+
+/** Marks the row whose bottom the band should stop being solid at — the day names. */
+@Composable fun Modifier.bandSolidLine(): Modifier {
+    val report = LocalBandSolidLine.current
+    return onGloballyPositioned { report(it.positionInRoot().y + it.size.height) }
+}

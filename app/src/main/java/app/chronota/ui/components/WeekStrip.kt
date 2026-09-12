@@ -37,7 +37,7 @@ import java.time.format.TextStyle
     val monday = weekStartOf(date, weekStart)
     val swipe = rememberSwipeController()
     Column(modifier.fillMaxWidth().padding(horizontal = Space.md).swipeGestures(swipe, onPrevious, onNext)) {
-        Row(Modifier.fillMaxWidth()) {
+        Row(Modifier.fillMaxWidth().bandSolidLine()) {
             repeat(7) { index ->
                 Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
                     Text(monday.plusDays(index.toLong()).dayOfWeek.getDisplayName(TextStyle.NARROW, locale),

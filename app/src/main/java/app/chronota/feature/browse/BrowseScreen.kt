@@ -469,7 +469,7 @@ fun ModeTabs(labels: List<Int>, selected: Int, select: (Int) -> Unit, tag: Strin
 @Composable private fun WeekGridHeader(date: LocalDate) {
     val locale = LocalResources.current.configuration.locales[0]
     val monday = weekStartOf(date, LocalDisplayPreferences.current.weekStart)
-    Row(Modifier.fillMaxWidth().padding(horizontal = Space.md).padding(top = Space.xxs)) {
+    Row(Modifier.fillMaxWidth().bandSolidLine().padding(horizontal = Space.md).padding(top = Space.xxs)) {
         Spacer(Modifier.width(Metrics.weekGutter))
         repeat(7) { index ->
             Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
