@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.layer.GraphicsLayer
 import androidx.compose.ui.graphics.layer.drawLayer
 import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
@@ -66,29 +67,40 @@ private const val BandTint = .3f
 @Composable
 fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() -> Unit) {
     val layer = rememberGraphicsLayer()
-    var origin by remember { mutableStateOf(Offset.Zero) }
-    var bandPx by remember { mutableStateOf(0) }
     val density = LocalDensity.current
-    Box(Modifier.fillMaxSize()) {
-        Box(Modifier.fillMaxSize()
-            .onGloballyPositioned { origin = it.positionInRoot() }
-            .drawWithContent { layer.record { this@drawWithContent.drawContent() }; drawLayer(layer) }) {
-            // The body starts at the band's lower edge, or at the glass's own line when that glass can
-            // be seen through. There is no point putting the schedule behind a stain that shows
-            // nothing: it would only bury the top of the timeline under an opaque band.
-            val bodyFrom = if (BandGlassEnabled && BandTint < 1f) SolidFraction else 1f
-            Column(Modifier.fillMaxSize().sheetSurface()) {
-                Spacer(Modifier.height(with(density) { (bandPx * bodyFrom).toDp() }))
-                // A scroll inside is told how much of the band it begins under, so it can rest its first
-                // row at the band's lower edge rather than up at the glass line — and so that the stretch
-                // above that row, which is the blank before the day starts, is what sits under the glass.
-                CompositionLocalProvider(LocalBandHead provides with(density) { (bandPx * (1f - bodyFrom)).toDp() } + Metrics.hairline) { body() }
+    // One measurement for both: the band is measured first, so the body can be laid out and the glass
+    // drawn against a height that is already real. The alternative — measure, hold the height in state,
+    // recompose — draws one frame where the height is still zero, and a gradient over zero pixels is
+    // not a gradient: every pixel clamps to its last stop, which is the band as a flat slab of its
+    // floor colour. That frame is what a screenshot catches and what the eye catches on the way in.
+    SubcomposeLayout { constraints ->
+        var origin = Offset.Zero
+        val bandPlaceable = subcompose(BandSlot) {
+            Box(Modifier.fillMaxWidth().onGloballyPositioned { origin = it.positionInRoot() }.clipToBounds().glassBand(layer, origin)) { band() }
+        }.first().measure(constraints.copy(minHeight = 0))
+        val bandPx = bandPlaceable.height
+        val bodyFrom = if (BandGlassEnabled && BandTint < 1f) SolidFraction else 1f
+        val bandDp = with(density) { bandPx.toDp() }
+        val bodyPlaceable = subcompose(BodySlot) {
+            Box(Modifier.fillMaxSize().drawWithContent { layer.record { this@drawWithContent.drawContent() }; drawLayer(layer) }) {
+                Column(Modifier.fillMaxSize().sheetSurface()) {
+                    Spacer(Modifier.height(bandDp * bodyFrom))
+                    // A scroll inside is told how much of the band it begins under, so it can rest its
+                    // first row at the band's lower edge rather than up at the glass line — and so that
+                    // the stretch above that row, the blank before a day starts, sits under the glass.
+                    CompositionLocalProvider(LocalBandHead provides bandDp * (1f - bodyFrom) + Metrics.hairline) { body() }
+                }
             }
+        }.first().measure(constraints)
+        layout(constraints.maxWidth, constraints.maxHeight) {
+            bodyPlaceable.place(0, 0)
+            bandPlaceable.place(0, 0)
         }
-        // The band is its own content.
-        Box(Modifier.align(Alignment.TopStart).fillMaxWidth().onSizeChanged { bandPx = it.height }.clipToBounds().glassBand(layer, origin)) { band() }
     }
 }
+
+private object BandSlot
+private object BodySlot
 
 /**
  * The band: flat grey across its content, and — once the glass is on — the lens over it with the grey

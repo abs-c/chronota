@@ -23,7 +23,7 @@ import kotlin.math.roundToInt
 internal const val FrostRadiusDp = 3f
 
 /** Room around a glass surface for the frost to reach into, so its edges are not clamped. */
-internal const val FrostPaddingDp = 40f
+internal const val FrostPaddingDp = 24f
 
 /**
  * The frost a glass surface is made of: the page behind it, blurred, and nothing else. The dock,
