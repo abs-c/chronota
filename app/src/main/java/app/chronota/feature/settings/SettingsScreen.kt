@@ -69,22 +69,6 @@ fun SettingsScreen(themeMode: ThemeMode, onTheme: (ThemeMode) -> Unit, onBack: (
             OptionRow(stringResource(R.string.notification_settings), AppIcons.Bell, notificationSettings)
             if (exactSettings != null) OptionRow(stringResource(R.string.exact_alarms), AppIcons.Alarm, exactSettings)
             }
-            // What build this is, and when it was installed. Every preview carries the same released
-            // version number and the file names repeat, so reading it off the screen is the only way
-            // to tell one build from another when a screenshot is all there is to go on.
-            val context = androidx.compose.ui.platform.LocalContext.current
-            val build = remember(context) {
-                runCatching {
-                    val info = context.packageManager.getPackageInfo(context.packageName, 0)
-                    val installed = java.time.Instant.ofEpochMilli(info.lastUpdateTime).atZone(java.time.ZoneId.systemDefault())
-                    val code = if (android.os.Build.VERSION.SDK_INT >= 28) info.longVersionCode else @Suppress("DEPRECATION") info.versionCode.toLong()
-                    "${info.versionName} ($code) · " +
-                        installed.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
-                }.getOrDefault("")
-            }
-            SettingsSection(R.string.version_info) {
-            OptionRow(stringResource(R.string.app_name), null, {}, arrow = false, value = build)
-            }
         }
     }
     when (panel) {

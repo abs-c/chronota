@@ -282,7 +282,6 @@
     <string name="backup_error_config">请先填写 WebDAV 信息</string>
     <string name="backup_error_format">这不是 Chronota 的备份，或版本太新</string>
     <string name="settings_notifications">提醒</string>
-    <string name="version_info">版本信息</string>
     <string name="week_start_sunday">周日</string>
     <string name="week_start_monday">周一</string>
     <string name="edit_scope">编辑范围</string>

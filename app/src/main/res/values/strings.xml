@@ -285,7 +285,6 @@
     <string name="backup_error_config">Fill in the WebDAV details first</string>
     <string name="backup_error_format">That is not a Chronota backup, or it comes from a newer version</string>
     <string name="settings_notifications">Reminders</string>
-    <string name="version_info">Version</string>
     <string name="delete_property_warning">Deleting this attribute also removes the values already recorded for it.</string>
     <string name="property_in_use">Attribute in use</string>
     <plurals name="property_used_warning">

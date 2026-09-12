@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.IntSize
 import kotlin.math.roundToInt
 
 /** How far the frost spreads: enough to lose a grid line, small enough to keep the page's colour. */
-internal const val FrostRadiusDp = 3f
+internal const val FrostRadiusDp = 5f
 
 /** Room around a glass surface for the frost to reach into, so its edges are not clamped. */
 internal const val FrostPaddingDp = 24f
