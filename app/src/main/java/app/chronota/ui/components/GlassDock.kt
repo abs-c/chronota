@@ -63,7 +63,7 @@ fun GlassDock(route: String, navigate: (String) -> Unit, timer: TimerSession?, d
             .shadow(Metrics.floatingElevation, CircleShape, ambientColor = Color.Black.copy(alpha = .08f), spotColor = Color.Black.copy(alpha = .12f)).clip(CircleShape)
             // Nearly opaque, like the chrome of a system bar: what is behind a dock is text and grid
             // lines, and at a low alpha they frost into patches of grey that read as a split pane.
-            .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.surface, tintAlpha = .18f)
+            .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.surface, tintAlpha = .07f)
             .drawWithContent {
                 drawContent()
                 // The light falling on the top of the glass, and the shade gathering at its bottom.

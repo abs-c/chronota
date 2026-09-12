@@ -96,22 +96,22 @@ fun FloatingOrb(timer: TimerSession?, defaultAction: OrbAction, onAction: (OrbAc
             Modifier.align(Alignment.TopEnd).offset(y = -Metrics.orb / 2), style = MaterialTheme.typography.labelMedium)
         val stain = MaterialTheme.colorScheme.primary
         Box(Modifier.size(Metrics.orb).graphicsLayer { scaleX = pressScale; scaleY = pressScale }.shadow(Metrics.floatingElevation, CircleShape, ambientColor = Color.Black.copy(alpha = .06f), spotColor = Color.Black.copy(alpha = .10f)).clip(CircleShape)
-            // Stained glass: the colour is a stain on the pane, not a coat of paint over it, so the
-            // page still reads through it. What lifts it out of being flat is the light — the pane is
-            // thicker at its rim, and one highlight where the light lands — never a white wash over
-            // the whole drop, which only bleaches the colour out.
-            .glassSurface(backdrop, backdropOrigin, stain, tintAlpha = .68f)
+            // Stained glass: a pane you look through, not a disc painted over. Face on, the glass is
+            // thin and nearly clear — the page reads straight through the middle of it — and the
+            // colour is deepest where the light travels through more of it, at the rim. One highlight
+            // where the light lands; no white wash over the whole drop, which only bleaches the colour.
+            .glassSurface(backdrop, backdropOrigin, stain, tintAlpha = .18f)
             .drawWithContent {
                 drawContent()
                 drawCircle(brush = Brush.radialGradient(
-                    listOf(Color.Transparent, Color.Transparent, stain.copy(alpha = .3f)),
+                    listOf(Color.Transparent, Color.Transparent, stain.copy(alpha = .62f)),
                     center = center,
                     radius = size.minDimension * .5f,
                 ))
                 drawCircle(brush = Brush.radialGradient(
-                    listOf(Color.White.copy(alpha = .26f), Color.White.copy(alpha = .04f), Color.Transparent),
-                    center = Offset(size.width * .33f, size.height * .27f),
-                    radius = size.minDimension * .5f,
+                    listOf(Color.White.copy(alpha = .22f), Color.White.copy(alpha = .03f), Color.Transparent),
+                    center = Offset(size.width * .32f, size.height * .26f),
+                    radius = size.minDimension * .38f,
                 ))
             }
             .glassRing()
@@ -143,7 +143,7 @@ fun FloatingOrb(timer: TimerSession?, defaultAction: OrbAction, onAction: (OrbAc
                     }
                 }
             }, contentAlignment = Alignment.Center) {
-            Icon(if (expanded) AppIcons.Close else if (timer != null && !fixedAction) AppIcons.Timer else defaultAction.icon(), null, tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(Metrics.icon))
+            Icon(if (expanded) AppIcons.Close else if (timer != null && !fixedAction) AppIcons.Timer else defaultAction.icon(), null, tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(Metrics.icon))
             if (pressed && !expanded) Canvas(Modifier.matchParentSize().padding(Space.xxs)) { drawArc(Color.White.copy(alpha = .8f), -90f, hold.value * 360f, false, style = Stroke(Metrics.outline.toPx())) }
         }
     }

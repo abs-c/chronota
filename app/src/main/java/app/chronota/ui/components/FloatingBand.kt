@@ -73,6 +73,7 @@ fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() 
     var bounds by remember { mutableStateOf(IntSize.Zero) }
     var origin by remember { mutableStateOf(Offset.Zero) }
     val base = MaterialTheme.colorScheme.background
+    val edge = MaterialTheme.colorScheme.outlineVariant
     val effect = remember(bounds, density) {
         // A radius of 0 makes the lens's normal degenerate along the band's flat edges: the shader
         // normalises an empty vector there and the bend comes out as nothing at all. A hair of a
@@ -90,7 +91,7 @@ fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() 
             translate(-padding, -padding) { drawLayer(lens) }
         }
         // Grey across the band's content, then spent over the last [Metrics.bandGlass] of its height —
-        // from the date's baseline down to the lower edge — so that stretch of the band is glass
+        // from above the date's baseline down to the lower edge — so that stretch of the band is glass
         // resting on the sheet, and the schedule passing under it is seen there.
         val solidTop = (size.height - Metrics.bandGlass.toPx()).coerceAtLeast(0f)
         val end = size.height.coerceAtLeast(1f)
@@ -102,6 +103,22 @@ fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() 
                 startY = 0f,
                 endY = end,
             )
+        )
+        // The band's own edge, where the glass meets the sheet: the pane's lit inner side, then the
+        // step of its thickness, both soft at the ends so the edge is an edge and not a rule.
+        val hairline = Metrics.hairline.toPx()
+        val edgeY = size.height - hairline
+        drawLine(
+            brush = Brush.horizontalGradient(listOf(Color.Transparent, Color.White.copy(alpha = .75f), Color.White.copy(alpha = .9f), Color.White.copy(alpha = .75f), Color.Transparent)),
+            start = Offset(0f, edgeY - hairline * 2),
+            end = Offset(size.width, edgeY - hairline * 2),
+            strokeWidth = hairline * 2,
+        )
+        drawLine(
+            brush = Brush.horizontalGradient(listOf(Color.Transparent, edge.copy(alpha = .55f), Color.Transparent)),
+            start = Offset(0f, edgeY),
+            end = Offset(size.width, edgeY),
+            strokeWidth = hairline,
         )
         drawContent()
     }
