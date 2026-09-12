@@ -64,6 +64,12 @@ fun GlassDock(route: String, navigate: (String) -> Unit, timer: TimerSession?, d
             // Nearly opaque, like the chrome of a system bar: what is behind a dock is text and grid
             // lines, and at a low alpha they frost into patches of grey that read as a split pane.
             .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.surface, tintAlpha = .72f)
+            .drawWithContent {
+                drawContent()
+                // The light falling on the top of the glass, and the shade gathering at its bottom.
+                drawRect(Brush.verticalGradient(listOf(Color.White.copy(alpha = .18f), Color.Transparent), endY = size.height * .58f))
+                drawRect(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = .05f)), startY = size.height * .62f))
+            }
             .glassRing()) {
             Row(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface.copy(alpha = .08f)).padding(Space.xxs).selectableGroup()) {
                 routes.forEachIndexed { index, destination ->
