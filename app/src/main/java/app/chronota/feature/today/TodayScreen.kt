@@ -127,12 +127,10 @@ fun TodayScreen(onSettings: () -> Unit, state: WorkspaceState = WorkspaceState()
         }
         // The lane labels hug the hours: they name the two columns, they are not a band of their own.
         Spacer(Modifier.height(Space.xxs))
-        // The schedule reaches up into the band's glass: its viewport starts that far above the
-        // sheet, and its content is padded by the same amount so it still rests below the band. What
-        // scrolls up into the glass is refracted there; what is above it is hidden by the band's grey.
-        val glass = Metrics.bandGlass
-        Box(Modifier.weight(1f).offset { IntOffset(0, -with(density) { glass.roundToPx() }) }.padding(bottom = glass)) {
-            Box(Modifier.fillMaxSize().topFade().verticalScroll(scroll).padding(horizontal = Space.md).padding(top = Space.sm + glass).padding(bottom = Metrics.dockClearance)) {
+        // The band's glass hangs over the top of this: the schedule keeps its own bounds, so the top
+        // of it is seen through the glass and its lower edge still reaches the foot of the page.
+        Box(Modifier.weight(1f)) {
+            Box(Modifier.fillMaxSize().topFade().verticalScroll(scroll).padding(horizontal = Space.md).padding(top = Space.sm).padding(bottom = Metrics.dockClearance)) {
                 Box(Modifier.fillMaxWidth().height(height)) {
                     val hours = (day.millis / 3_600_000).toInt()
                     repeat(hours + 1) { hour ->

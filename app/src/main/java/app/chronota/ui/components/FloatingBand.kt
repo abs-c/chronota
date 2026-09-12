@@ -47,18 +47,26 @@ fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() 
     var origin by remember { mutableStateOf(Offset.Zero) }
     var bandPx by remember { mutableStateOf(0) }
     val density = LocalDensity.current
+    val glass = Metrics.bandGlass
     Box(Modifier.fillMaxSize()) {
         Box(Modifier.fillMaxSize()
             .onGloballyPositioned { origin = it.positionInRoot() }
             .drawWithContent { layer.record { this@drawWithContent.drawContent() }; drawLayer(layer) }) {
             // The sheet runs the whole page, the band's own strip included: what the band has to
-            // refract is this sheet and whatever the schedule has scrolled up into it.
+            // refract is this sheet and the top of the schedule, which sits under the band's glass.
             Column(Modifier.fillMaxSize().sheetSurface()) {
-                Spacer(Modifier.height(with(density) { bandPx.toDp() }))
+                Spacer(Modifier.height((with(density) { bandPx.toDp() } - glass).coerceAtLeast(0.dp)))
                 body()
             }
         }
-        Box(Modifier.align(Alignment.TopStart).fillMaxWidth().onSizeChanged { bandPx = it.height }.clipToBounds().glassBand(layer, origin)) { band() }
+        // The band is its content plus a strip of glass below it. That strip hangs over the top of the
+        // schedule; the schedule does not reach up into it, because moving the timeline's own bounds
+        // to get under the glass moved its lower edge with them and left a band of bare white page
+        // where the schedule used to reach.
+        Column(Modifier.align(Alignment.TopStart).fillMaxWidth().onSizeChanged { bandPx = it.height }.clipToBounds().glassBand(layer, origin)) {
+            band()
+            Spacer(Modifier.height(glass))
+        }
     }
 }
 

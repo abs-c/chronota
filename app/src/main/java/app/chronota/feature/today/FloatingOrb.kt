@@ -95,23 +95,17 @@ fun FloatingOrb(timer: TimerSession?, defaultAction: OrbAction, onAction: (OrbAc
         if (timer != null && !expanded) Text(timerElapsedText(timer.elapsed(now)),
             Modifier.align(Alignment.TopEnd).offset(y = -Metrics.orb / 2), style = MaterialTheme.typography.labelMedium)
         val stain = MaterialTheme.colorScheme.primary
-        Box(Modifier.size(Metrics.orb).graphicsLayer { scaleX = pressScale; scaleY = pressScale }.shadow(Metrics.floatingElevation, CircleShape, ambientColor = Color.Black.copy(alpha = .06f), spotColor = Color.Black.copy(alpha = .10f)).clip(CircleShape)
-            // Stained glass: a pane you look through, not a disc painted over. Face on, the glass is
-            // thin and nearly clear — the page reads straight through the middle of it — and the
-            // colour is deepest where the light travels through more of it, at the rim. One highlight
-            // where the light lands; no white wash over the whole drop, which only bleaches the colour.
-            .glassSurface(backdrop, backdropOrigin, stain, tintAlpha = .18f)
+        Box(Modifier.size(Metrics.orb).graphicsLayer { scaleX = pressScale; scaleY = pressScale }.shadow(Metrics.floatingElevation, CircleShape, ambientColor = Color.Black.copy(alpha = .04f), spotColor = Color.Black.copy(alpha = .06f)).clip(CircleShape)
+            // Ordinary glass — the same material as the dock — with the theme colour washed over it
+            // at a low opacity, and one highlight where the light lands. Nothing else: every extra
+            // layer over the tint is another layer that can bleach the colour out of it.
+            .glassSurface(backdrop, backdropOrigin, stain, tintAlpha = .22f)
             .drawWithContent {
                 drawContent()
                 drawCircle(brush = Brush.radialGradient(
-                    listOf(Color.Transparent, Color.Transparent, stain.copy(alpha = .62f)),
-                    center = center,
-                    radius = size.minDimension * .5f,
-                ))
-                drawCircle(brush = Brush.radialGradient(
-                    listOf(Color.White.copy(alpha = .22f), Color.White.copy(alpha = .03f), Color.Transparent),
+                    listOf(Color.White.copy(alpha = .2f), Color.White.copy(alpha = .03f), Color.Transparent),
                     center = Offset(size.width * .32f, size.height * .26f),
-                    radius = size.minDimension * .38f,
+                    radius = size.minDimension * .4f,
                 ))
             }
             .glassRing()

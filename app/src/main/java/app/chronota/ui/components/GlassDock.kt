@@ -60,7 +60,7 @@ fun GlassDock(route: String, navigate: (String) -> Unit, timer: TimerSession?, d
     Row(Modifier.fillMaxWidth().padding(horizontal = Space.md, vertical = Space.lg), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(Space.sm)) {
         Box(Modifier.weight(1f).requiredHeight(Metrics.dockHeight).testTag("glass_dock")
             .graphicsLayer { alpha = if (wheelOpen) 0f else 1f }
-            .shadow(Metrics.floatingElevation, CircleShape, ambientColor = Color.Black.copy(alpha = .08f), spotColor = Color.Black.copy(alpha = .12f)).clip(CircleShape)
+            .shadow(Metrics.floatingElevation, CircleShape, ambientColor = Color.Black.copy(alpha = .04f), spotColor = Color.Black.copy(alpha = .06f)).clip(CircleShape)
             // Nearly opaque, like the chrome of a system bar: what is behind a dock is text and grid
             // lines, and at a low alpha they frost into patches of grey that read as a split pane.
             .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.surface, tintAlpha = .07f)
