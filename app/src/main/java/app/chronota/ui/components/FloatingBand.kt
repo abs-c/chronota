@@ -17,7 +17,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import kotlin.math.roundToInt
 import app.chronota.ui.theme.Metrics
@@ -27,9 +26,11 @@ import app.chronota.ui.theme.Metrics
  *
  * The layering a timeline wants: the white body and the blocks are the bottom layer, the gray date
  * band is the middle one, resting on top of them, and the dock and the orb float above everything.
- * The body is drawn a band taller than the page so its top runs under the band, and the band is the
- * dock's own glass — same lens, same tint — masked so the refraction arrives from the band's lower
- * edge inward rather than sitting as a uniform sheet.
+ * The band sits over the top of the sheet and turns into glass as it comes down into it.
+ *
+ * The band reserves its own height above the body: the sheet runs under it, the schedule starts
+ * below it. Nothing of the body is left behind the glass — a chip or an hour label under a lens
+ * comes back as a smeared patch of its own colour, which reads as a broken pixel, not as glass.
  *
  * The body is recorded into its own layer for the band to refract: sampling the backdrop the dock
  * uses is not possible here, because the band lives inside the page that backdrop is recorded from
@@ -44,11 +45,9 @@ fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() 
     val density = LocalDensity.current
     Box(Modifier.fillMaxSize()) {
         Box(Modifier.fillMaxSize()
-            .offset { IntOffset(0, -bandPx) }
             .onGloballyPositioned { origin = it.positionInRoot() }
             .drawWithContent { layer.record { this@drawWithContent.drawContent() }; drawLayer(layer) }) {
             Column(Modifier.fillMaxSize().sheetSurface()) {
-                // The body keeps clear of the band, and scrolls under it from there.
                 Spacer(Modifier.height(with(density) { bandPx.toDp() }))
                 body()
             }
