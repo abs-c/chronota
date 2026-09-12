@@ -27,13 +27,14 @@ import app.chronota.ui.theme.Metrics
 /**
  * A page with a band across its top and the page's own body under it.
  *
- * The band is glass over the schedule. Its lower [Metrics.bandGlass] is transparent, so the timeline
- * that reaches up behind it is seen there and bent by the lens along its lower edge; above that the
- * band closes into the page's grey, so the date and the week strip on it stay legible. A band that is
- * glass all the way up has no surface for its own content to sit on, and a band that is grey all the
- * way down has nothing to refract.
+ * The band is glass over the schedule. It closes into the page's grey across its own content, so the
+ * date and the week strip stay legible, and the last [Metrics.bandGlass] of its height is clear glass
+ * — the schedule that reaches up there is seen and bent by the lens along the band's lower edge. A
+ * band that is glass all the way up has no surface for its content to sit on; a band that is grey all
+ * the way down has nothing to refract. The glass is below the date row, never across it: what shows
+ * through the date row is a smear of whatever is behind it, which is what made that row look broken.
  *
- * The body still starts below the band — nothing scrolls out from under it by accident. The timeline
+ * The body still starts below the band — nothing scrolls out from under it by accident. The schedule
  * reaches up into the glass itself, which is the one thing that belongs there.
  *
  * The body is recorded into its own layer for the band to frost and bend: sampling the backdrop the
@@ -58,8 +59,8 @@ fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() 
             }
         }
         Box(Modifier.align(Alignment.TopStart).fillMaxWidth().onSizeChanged { bandPx = it.height }.clipToBounds().glassBand(layer, origin)) {
-            // The band keeps room under its own content for the glass and the grey fading into it, so
-            // no band has to know how deep its glass is and none of them fades across its date row.
+            // The band keeps the glass and the grey's fade below its own content, so every band has
+            // its glass under its date row whatever its content turned out to be.
             Column(Modifier.padding(bottom = Metrics.bandGlass * 2)) { band() }
         }
     }
@@ -67,8 +68,7 @@ fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() 
 
 /**
  * The band's glass: the lens over the whole band, then the page's grey closing over it towards the
- * top. What is left transparent at the lower edge is where the schedule shows through, bending with
- * the lens.
+ * top. The clear part at the lower edge is where the schedule shows through as it passes under.
  */
 @Composable fun Modifier.glassBand(backdrop: GraphicsLayer, backdropOrigin: Offset): Modifier {
     val lens = rememberGraphicsLayer()
@@ -93,7 +93,8 @@ fun FloatingBand(band: @Composable () -> Unit, body: @Composable ColumnScope.() 
             }
             translate(-padding, -padding) { drawLayer(lens) }
         }
-        // Solid grey by the top, nothing left by the time it reaches the glass.
+        // Grey over the band's content, spent by the time it reaches the glass, so the band's lower
+        // edge is glass on the sheet rather than a grey strip painted over it.
         val strip = Metrics.bandGlass.toPx()
         val glassTop = (size.height - strip).coerceAtLeast(1f)
         val solidTop = (size.height - 2 * strip).coerceAtLeast(0f)

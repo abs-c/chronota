@@ -97,7 +97,7 @@ fun FloatingOrb(timer: TimerSession?, defaultAction: OrbAction, onAction: (OrbAc
         Box(Modifier.size(Metrics.orb).graphicsLayer { scaleX = pressScale; scaleY = pressScale }.shadow(Metrics.floatingElevation, CircleShape, ambientColor = Color.Black.copy(alpha = .06f), spotColor = Color.Black.copy(alpha = .10f)).clip(CircleShape)
             // Clear glass rather than a painted disc: the page reads through the tint and the edge is
             // the shared glass rim. No wash of white over it — that only bleached the colour out.
-            .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.primary, tintAlpha = .7f)
+            .glassSurface(backdrop, backdropOrigin, MaterialTheme.colorScheme.primary, tintAlpha = .92f)
             .glassRing()
             .semantics { contentDescription = description; role = Role.Button; onClick { tap(); true }; onLongClick { expanded = true; true } }
             .testTag(if (fixedAction) if (defaultAction == OrbAction.PLAN) "add_plan" else "add_record" else "orb_primary").pointerInput(defaultAction, timer?.token, fixedAction) {

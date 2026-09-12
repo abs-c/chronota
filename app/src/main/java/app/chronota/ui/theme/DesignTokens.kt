@@ -86,12 +86,14 @@ object Metrics {
     val wheelSize = 268.dp
 
     /**
-     * How deep the band's glass is at its lower edge: the strip that stays transparent, where the
-     * schedule passes behind it and is refracted. Above it the band closes into solid grey, so the
-     * date on it stays legible, and the band keeps twice this below its own content — the glass and
-     * the fade into it — so that neither ever reaches the date row.
+     * The band's glass, measured from its lower edge: this much stays clear glass, where the schedule
+     * passing behind it is seen and bent, and the grey fades out over the same distance just above.
+     * The band reserves twice this below its own content, so the date row always sits on solid grey
+     * and the glass never reaches it.
      */
     val bandGlass = 18.dp
+
+
 
     // Timeline and calendars.
     /** Wide enough for a clock time plus the raised "+1" that marks the next calendar date. */
